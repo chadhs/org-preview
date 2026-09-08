@@ -42,9 +42,16 @@ jobs:
       - name: Desktop smoke test on Linux
         if: runner.os == 'Linux'
         run: xvfb-run --auto-servernum npm run test:smoke
-      - name: Package macOS prototype
+      - name: Package macOS application
         if: runner.os == 'macOS'
-        run: npm run dist:mac
+        # PR signing is strictly ad-hoc. No signing certificate, private key,
+        # or notarization credentials are supplied to this read-only build job.
+        env:
+          CSC_FOR_PULL_REQUEST: 'true'
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          CSC_LINK: ''
+          CSC_KEY_PASSWORD: ''
+        run: npm run dist:mac -- -c.mac.identity=- -c.mac.notarize=false
       - name: Package Linux prototype
         if: runner.os == 'Linux'
         run: npm run dist:linux
