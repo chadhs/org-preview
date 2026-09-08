@@ -1,4 +1,0 @@
-PASS command-line Unicode/spaced path, mailto, ordered lists, outline; compositor xwayland=true
-PASS save preserves scroll=3000 and search match=2/31
-PASS atomic replace and delete/recreate live recovery
-PASS file-backed drops, errors, switching, live updates, HTML/code inert, no renderer errors

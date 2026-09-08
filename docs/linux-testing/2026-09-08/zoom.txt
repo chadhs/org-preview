@@ -1,1 +1,0 @@
-{ before: 1183, zoomIn: 1080, zoomOut: 1183, reset: 1183 }

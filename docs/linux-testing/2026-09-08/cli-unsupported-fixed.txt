@@ -1,1 +1,0 @@
-PASS initial unsupported CLI error and recovery by file drop

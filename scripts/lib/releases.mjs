@@ -89,7 +89,7 @@ export function releaseNotes({ version, repository, source, changes = '' }) {
     `Includes an outline, search, source view, themes, zoom, and common Org formatting. Documents stay local; embedded HTML and Babel blocks never execute. BSD-3-Clause, with the MIT-licensed Orga parser.\n\n` +
     `### Install\n\n` +
     `- **Apple Silicon Mac:** download \`Org Preview-${version}-arm64.dmg\` or \`Org Preview-${version}-arm64-mac.zip\`, then move the app to Applications. Keep one installed copy to avoid Finder ambiguity. Builds are unsigned and unnotarized; macOS may require approval before first launch.\n` +
-    `- **Linux x86_64:** make \`Org Preview-${version}.AppImage\` executable and run it. If FUSE 2 is unavailable, add \`--appimage-extract-and-run\`, or extract \`org-preview-${version}.tar.gz\` and run its \`org-preview\` executable. The tar archive does not install a desktop launcher.\n` +
+    `- **Linux x86_64, including Arch/Omarchy:** make \`Org Preview-${version}.AppImage\` executable and run it. If FUSE 2 is unavailable, add \`--appimage-extract-and-run\`, or extract \`org-preview-${version}.tar.gz\` and run its \`org-preview\` executable. The tar archive does not install a desktop launcher.\n` +
     `- Compare each download's SHA-256 with the attached platform checksum file.\n\n` +
     `### Known limits\n\nOne UTF-8 document at a time, up to 4 MB. Editing, full Emacs export parity, local image/file links, math/diagrams, Babel, Quick Look, signing, and auto-updates remain outside scope. Intel Mac builds are not supplied.\n\n` +
     `[Release information](https://github.com/${repository}/blob/v${version}/RELEASE-NOTES.org) · [Merged source](https://github.com/${repository}/commit/${source})\n\n` + changes;

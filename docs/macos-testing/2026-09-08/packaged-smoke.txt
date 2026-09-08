@@ -1,1 +1,0 @@
-Desktop smoke passed (packaged): open, file-backed drops, Unicode paths, input errors, CLI handoff, macOS window reopening, render, source, themes, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, sandbox, and HTML safety.

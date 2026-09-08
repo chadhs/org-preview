@@ -46,10 +46,13 @@ Finder's Open With menu for an =.org= document.
 
 These builds are unsigned and unnotarized. macOS may block the first launch.
 The automated build does not exercise Gatekeeper approval for a downloaded,
-quarantined artifact; consult the macOS testing report for that limitation. Signing and notarization
-are outside the current scope.
+quarantined artifact. Signing and notarization are outside the current scope.
 
-** Linux and Omarchy
+** Linux, Arch, and Omarchy
+The Linux x86_64 builds work on Arch-based systems, including Omarchy.
+Native testing used Omarchy 4.0.2 / Hyprland 0.56.2 with Wayland and XWayland.
+There is no AUR or pacman package yet.
+
 Make the AppImage executable, then launch it as your normal desktop user.
 
 #+begin_src sh
@@ -90,7 +93,8 @@ The implementation has passed automated checks on macOS and Linux, real
 Omarchy Wayland/XWayland testing, and Mac native checks. The user verified
 Finder dragging and Mac keyboard shortcuts. CI tests the Mac ZIP application
 and validates the extracted AppImage's desktop entry, icon, and sandbox flags.
-See [[file:MACOS-TESTING.org][macOS results]] and [[file:LINUX-TESTING.org][Linux results]] for the detailed test history.
+The README summarizes platform verification. Automated tests stay in the
+repository; per-run screenshots and build logs are CI artifacts.
 
 Org Preview and its artwork use BSD-3-Clause. The Org parser, Orga, uses MIT.
 Bundled dependencies retain their licenses in =THIRD-PARTY-NOTICES.org=.

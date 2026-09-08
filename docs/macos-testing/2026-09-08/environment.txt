@@ -1,7 +1,0 @@
-ProductName:		macOS
-ProductVersion:		26.6.2
-BuildVersion:		25G83
-arm64
-v24.20.0
-11.19.0
-8dbe922d19305f3ce9f03a86225ea1bec4b6cb8b
