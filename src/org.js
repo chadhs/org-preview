@@ -47,7 +47,9 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
       case 'priority': return `<span class="priority">${escapeHtml(node.value)}</span> `;
       case 'tags': return `<span class="tags">${node.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</span>`;
       case 'link': {
-        const value = node.path?.value || '';
+        const pathValue = node.path?.value || '';
+        // Orga separates mailto from its address, unlike HTTP URLs.
+        const value = node.path?.protocol === 'mailto' ? `mailto:${pathValue}` : pathValue;
         const label = children(node) || escapeHtml(value);
         if (node.path?.protocol === 'internal') {
           const target = value.startsWith('#') ? anchor(value.slice(1)) : outline.find((item) => item.label === value.replace(/^\*/, ''))?.id;
@@ -57,14 +59,21 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
         return `<span class="unresolved" title="Local and custom protocol links are not available in v0.1">${label}</span>`;
       }
       case 'list': {
-        const tag = node.ordered ? 'ol' : 'ul';
-        // Orga places a nested list beside its preceding item. Nest it inside the li.
-        const items = [];
+        // Orga may group ordered and unordered items in the same list node.
+        const groups = [];
         for (const child of node.children) {
-          if (child.type === 'list.item') items.push(`<li>${children(child)}</li>`);
-          else if (child.type === 'list' && items.length) items[items.length - 1] = items.at(-1).replace(/<\/li>$/, `${render(child)}</li>`);
+          if (child.type === 'list.item') {
+            const ordered = child.children.find((item) => item.type === 'list.item.bullet')?.ordered ?? node.ordered;
+            const tag = ordered ? 'ol' : 'ul';
+            if (groups.at(-1)?.tag !== tag) groups.push({ tag, items: [] });
+            groups.at(-1).items.push(`<li>${children(child)}</li>`);
+          } else if (child.type === 'list' && groups.length) {
+            // Nested lists belong inside the preceding item.
+            const items = groups.at(-1).items;
+            items[items.length - 1] = items.at(-1).replace(/<\/li>$/, `${render(child)}</li>`);
+          }
         }
-        return `<${tag}>${items.join('')}</${tag}>`;
+        return groups.map(({ tag, items }) => `<${tag}>${items.join('')}</${tag}>`).join('');
       }
       case 'list.item.checkbox': return `<input type="checkbox" disabled ${node.checked === true ? 'checked' : ''} aria-label="${node.checked === true ? 'Complete' : 'Incomplete'}"> `;
       case 'table': {

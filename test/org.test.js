@@ -43,3 +43,15 @@ test('empty files, no headings, Unicode and headings deeper than HTML supports',
   assert.equal(result.outline[0].id, 'org-café-日本語');
   assert.match(result.html, /<h6 /);
 });
+
+test('mailto links retain their protocol and escape address attributes', () => {
+  const { html } = renderOrg('[[mailto:reader@example.invalid][Email]]\n[[mailto:reader@example.invalid?subject="Org"][Subject]]');
+  assert.match(html, /href="mailto:reader@example.invalid"/);
+  assert.match(html, /href="mailto:reader@example.invalid\?subject=&quot;Org&quot;"/);
+});
+
+test('mixed list markers split into ordered and unordered lists while keeping nesting', () => {
+  const { html } = renderOrg('- Bullet\n  - Nested\n\n1. First\n2. Second\n  - Inside second\n\n- Back to bullets');
+  assert.match(html, /<ul><li>Bullet\s*<ul><li>Nested\s*<\/li><\/ul><\/li><\/ul><ol>/);
+  assert.match(html, /<li>First\s*<\/li><li>Second\s*<ul><li>Inside second\s*<\/li><\/ul><\/li><\/ol><ul><li>Back to bullets/);
+});

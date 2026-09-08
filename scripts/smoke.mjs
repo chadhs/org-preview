@@ -2,16 +2,20 @@ import { _electron as electron, expect } from '@playwright/test';
 import { mkdtemp, writeFile, rename, rm, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { spawn } from 'node:child_process';
 
 const directory = await mkdtemp(path.join(tmpdir(), 'org-preview-smoke-'));
-const file = path.join(directory, 'smoke.org');
+const file = path.join(directory, 'smoke café 日本語.org');
 await writeFile(file, '#+title: Desktop smoke test\n* TODO A heading :test:\nRead *this* in Org.\n- [X] Working\n\n#+begin_export html\n<img src=x onerror="window.compromised=true">\n#+end_export');
+await writeFile(path.join(directory, 'links.org'), '#+title: Links\n* Supported\n[[http://example.com][HTTP]] [[https://example.com][HTTPS]] [[mailto:reader@example.invalid][Mail]]');
 let app;
 try {
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  app = await electron.launch({ args: ['.', file], env });
+  app = await electron.launch({ args: ['.', file, ...process.argv.slice(2)], env, chromiumSandbox: true });
   const window = await app.firstWindow();
+  expect(app.process().spawnargs).not.toContain('--no-sandbox');
+  expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences().sandbox)).toBe(true);
   const errors = [];
   window.on('pageerror', (error) => errors.push(error.message));
   await expect(window.locator('#document-title')).toHaveText('Desktop smoke test');
@@ -31,6 +35,22 @@ try {
   await window.locator('#search').fill('Read');
   await expect(window.locator('#search-count')).toContainText('/ 1');
   await window.locator('#close-search').click();
+  // Refreshing search highlights must not jump back to the first match.
+  const longSource = '#+title: Scroll test\n* Reading\nneedle one\n\n' + 'A paragraph for scrolling.\n\n'.repeat(200) + 'needle two\n';
+  await writeFile(file, longSource);
+  await expect(window.locator('#document-title')).toHaveText('Scroll test');
+  await window.locator('#find-button').click();
+  await window.locator('#search').fill('needle');
+  await window.locator('#search').press('Enter');
+  await expect(window.locator('#search-count')).toHaveText('2 / 2');
+  await window.locator('#reader').evaluate((reader) => { reader.scrollTop = 1000; });
+  await writeFile(file, longSource + 'External save with search open.\n');
+  await expect(window.locator('#source')).toContainText('External save with search open.');
+  expect(await window.locator('#reader').evaluate((reader) => reader.scrollTop)).toBe(1000);
+  await expect(window.locator('#search-count')).toHaveText('2 / 2');
+  await window.locator('#search').press('Shift+Enter');
+  await expect(window.locator('#search-count')).toHaveText('1 / 2');
+  await window.locator('#close-search').click();
   await writeFile(file, '#+title: After saving\n* Updated\nThe file changed outside the app.');
   await expect(window.locator('#document-title')).toHaveText('After saving');
   await writeFile(path.join(directory, 'replacement'), '#+title: Atomic save\n* Still watching\nReplacement saves work.');
@@ -41,9 +61,47 @@ try {
   await writeFile(file, '#+title: Recreated\n* Returned\nThe watcher recovered.');
   await expect(window.locator('#document-title')).toHaveText('Recreated');
   await expect(window.locator('#error')).toBeHidden();
+  const unsupported = path.join(directory, 'unsupported.txt');
+  const oversized = path.join(directory, 'oversized.org');
+  await writeFile(unsupported, 'Unsupported');
+  await writeFile(oversized, Buffer.alloc(4 * 1024 * 1024 + 1));
+  // File-backed Chromium drops exercise Electron's webUtils.getPathForFile.
+  const cdp = await window.context().newCDPSession(window);
+  async function drop(filePath) {
+    for (const type of ['dragEnter', 'dragOver', 'drop']) {
+      await cdp.send('Input.dispatchDragEvent', { type, x: 500, y: 300, data: { items: [], files: [filePath], dragOperationsMask: 1 } });
+    }
+  }
+  await drop(path.join(directory, 'links.org'));
+  await expect(window.locator('#document-title')).toHaveText('Links');
+  await app.evaluate(({ shell }) => {
+    globalThis.openedLinks = [];
+    shell.openExternal = async (url) => { globalThis.openedLinks.push(url); };
+  });
+  for (const href of ['http://example.com', 'https://example.com', 'mailto:reader@example.invalid']) {
+    await window.locator(`#content a[href="${href}"]`).click();
+  }
+  expect(await app.evaluate(() => globalThis.openedLinks)).toEqual(['http://example.com/', 'https://example.com/', 'mailto:reader@example.invalid']);
+  await drop(unsupported);
+  await expect(window.locator('#error')).toContainText('Choose an .org file.');
+  await drop(oversized);
+  await expect(window.locator('#error')).toContainText('up to 4 MB');
+  await drop(file);
+  await expect(window.locator('#error')).toBeHidden();
+  await expect(window.locator('#filename')).toHaveText(path.basename(file));
+  // A second CLI invocation must report bad input instead of ignoring it.
+  const child = spawn(app.process().spawnfile, ['.', unsupported], { env, stdio: 'ignore' });
+  await new Promise((resolve, reject) => {
+    child.once('error', reject);
+    child.once('exit', (code) => code === 0 ? resolve() : reject(new Error(`Second instance exited ${code}`)));
+  });
+  await expect(window.locator('#error')).toContainText('Choose an .org file.');
   // Exercise the same picker path used by the Open button without a native dialog.
   await app.evaluate(({ dialog }, welcome) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [welcome] }); }, path.resolve('examples/welcome.org'));
   await window.locator('#open').click();
+  await expect(window.locator('#document-title')).toHaveText('Your words, in Org.');
+  await writeFile(file, '#+title: Old file must stay detached');
+  await new Promise((resolve) => setTimeout(resolve, 650));
   await expect(window.locator('#document-title')).toHaveText('Your words, in Org.');
   await mkdir('test-results', { recursive: true });
   await window.screenshot({ path: 'test-results/desktop-light.png' });
@@ -51,7 +109,7 @@ try {
   await window.screenshot({ path: 'test-results/desktop-dark.png' });
   await window.locator('#theme').selectOption('system');
   expect(errors).toEqual([]);
-  console.log('Desktop smoke passed: open, render, source, themes, search, external saves, atomic replacement, delete/recreate, sandbox, and HTML safety.');
+  console.log('Desktop smoke passed: open, file-backed drops, Unicode paths, input errors, CLI handoff, render, source, themes, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, sandbox, and HTML safety.');
 } finally {
   await app?.close();
   await rm(directory, { recursive: true, force: true });

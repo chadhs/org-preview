@@ -2,9 +2,10 @@ const { app, BrowserWindow, dialog, ipcMain, Menu, shell, session } = require('e
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { readDocument, watchDocument } = require('./documents.cjs');
+const { documentArgument } = require('./arguments.cjs');
 let win, current, stopWatching;
 let openRevision = 0;
-let pendingPath = process.argv.slice(app.isPackaged ? 1 : 2).find((arg) => !arg.startsWith('-') && /\.org$/i.test(arg));
+let pendingPath = documentArgument(process.argv, app.isPackaged);
 const pageUrl = pathToFileURL(path.join(__dirname, '../dist/index.html')).href;
 const fail = (error) => win?.webContents.send('document:error', error.code === 'ENOENT' ? 'File unavailable. Waiting for it to return, or open another file.' : error.message);
 
@@ -47,7 +48,7 @@ if (!locked) app.quit();
 else {
   app.on('open-file', (event, filePath) => { event.preventDefault(); if (win) openDocument(filePath).catch(fail); else pendingPath = filePath; });
   app.on('second-instance', (_event, argv, cwd) => {
-    const filePath = argv.slice(1).find((arg) => !arg.startsWith('-') && /\.org$/i.test(arg));
+    const filePath = documentArgument(argv, app.isPackaged);
     if (!win) { pendingPath = filePath && path.resolve(cwd, filePath); createWindow(); }
     else if (filePath) openDocument(path.resolve(cwd, filePath)).catch(fail);
     win?.restore(); win?.focus();

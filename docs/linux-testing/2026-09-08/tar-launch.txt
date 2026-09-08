@@ -1,0 +1,14 @@
+
+DevTools listening on ws://127.0.0.1:9333/devtools/browser/3f3fc396-786d-4460-a37b-f633ca84ca8f
+[982905:0908/141730.001877:ERROR:ui/ozone/platform/wayland/gpu/wayland_surface_factory.cc:249] '--ozone-platform=wayland' is not compatible with Vulkan. Consider switching to '--ozone-platform=x11' or disabling Vulkan
+Error occurred in handler for 'document:path': Error: This prototype supports files up to 4 MB.
+    at readDocument (/tmp/org-preview-tar-test/org-preview-0.1.0/resources/app.asar/electron/documents.cjs:13:38)
+    at async openDocument (/tmp/org-preview-tar-test/org-preview-0.1.0/resources/app.asar/electron/main.cjs:14:15)
+    at async /tmp/org-preview-tar-test/org-preview-0.1.0/resources/app.asar/electron/main.cjs:36:18
+    at async Session.<anonymous> (node:electron/js2c/browser_init:2:123634)
+Error occurred in handler for 'document:path': Error: Choose an .org file.
+    at readDocument (/tmp/org-preview-tar-test/org-preview-0.1.0/resources/app.asar/electron/documents.cjs:7:94)
+    at openDocument (/tmp/org-preview-tar-test/org-preview-0.1.0/resources/app.asar/electron/main.cjs:14:21)
+    at /tmp/org-preview-tar-test/org-preview-0.1.0/resources/app.asar/electron/main.cjs:36:24
+    at Session.<anonymous> (node:electron/js2c/browser_init:2:123650)
+    at Session.emit (node:events:514:28)

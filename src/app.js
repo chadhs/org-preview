@@ -23,7 +23,7 @@ function setView(source) {
   $('#source-tab').setAttribute('aria-pressed', String(source));
   $('#mode-label').textContent = source ? 'ORG SOURCE · READ ONLY' : 'ORG DOCUMENT';
   $('#reader').scrollTop = scrollPositions[source ? 'source' : 'preview'];
-  if ($('#search').value) finder.search($('#search').value, true, true);
+  if ($('#search').value) finder.search($('#search').value, true, true, false);
 }
 function goTo(id) {
   if (sourceMode) setView(false);
@@ -74,7 +74,7 @@ async function acceptDocument(doc) {
     dot.className = 'live-dot';
     $('#status').append(dot, document.createTextNode(`Live · updated ${new Date(doc.modified).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`));
     $('#reader').scrollTop = top;
-    if ($('#search').value) finder.search($('#search').value, true, true);
+    if ($('#search').value) finder.search($('#search').value, true, true, false);
     observer?.disconnect();
     observer = new IntersectionObserver((entries) => {
       const heading = entries.find((entry) => entry.isIntersecting);

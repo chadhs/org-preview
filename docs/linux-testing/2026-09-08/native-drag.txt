@@ -1,0 +1,1 @@
+PASS native Nautilus -> Wayland org-preview drag: second file Ω.org

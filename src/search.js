@@ -9,8 +9,9 @@ export function createSearch(root, scroller, report) {
     ranges = []; active = -1; query = '';
     report('');
   }
-  function search(value, forward = true, rebuild = false) {
+  function search(value, forward = true, rebuild = false, scroll = true) {
     if (!value) { clear(); return; }
+    const previousActive = value === query ? active : -1;
     if (value !== query || rebuild) {
       clear(); query = value;
       const walker = document.createTreeWalker(root(), NodeFilter.SHOW_TEXT, {
@@ -36,10 +37,12 @@ export function createSearch(root, scroller, report) {
       CSS.highlights.set('search-results', new Highlight(...ranges));
     }
     if (!ranges.length) { report('0 matches'); return; }
-    active = (active + (forward ? 1 : -1) + ranges.length) % ranges.length;
+    active = rebuild && previousActive >= 0 ? Math.min(previousActive, ranges.length - 1) : (active + (forward ? 1 : -1) + ranges.length) % ranges.length;
     CSS.highlights.set('search-active', new Highlight(ranges[active]));
-    const rect = ranges[active].getBoundingClientRect();
-    scroller.scrollTop += rect.top - scroller.getBoundingClientRect().top - scroller.clientHeight / 3;
+    if (scroll) {
+      const rect = ranges[active].getBoundingClientRect();
+      scroller.scrollTop += rect.top - scroller.getBoundingClientRect().top - scroller.clientHeight / 3;
+    }
     report(`${active + 1} / ${ranges.length}${ranges.length === 1000 ? '+' : ''}`);
   }
   return { search, clear };

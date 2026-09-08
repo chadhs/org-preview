@@ -1,0 +1,124 @@
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/.DirIcon
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/AppRun
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/LICENSE.electron.txt
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/LICENSES.chromium.html
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/chrome-sandbox
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/chrome_100_percent.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/chrome_200_percent.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/chrome_crashpad_handler
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/icudtl.dat
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/libffmpeg.so
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/libvk_swiftshader.so
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/libvulkan.so.1
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/af.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/am.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ar.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/bg.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/bn.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ca.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/cs.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/da.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/de.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/el.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/en-GB.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/en-US.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/es-419.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/es.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/et.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/fa.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/fi.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/fil.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/fr.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/gu.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/he.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/hi.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/hr.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/hu.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/id.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/it.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ja.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/kn.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ko.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/lt.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/lv.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ml.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/mr.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ms.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/nb.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/nl.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/pl.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/pt-BR.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/pt-PT.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ro.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ru.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/sk.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/sl.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/sr.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/sv.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/sw.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ta.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/te.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/th.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/tr.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/uk.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/ur.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/vi.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/zh-CN.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/locales/zh-TW.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/org-preview
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/org-preview.desktop
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/org-preview.png
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources/app-update.yml
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources/app.asar
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources.pak
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/snapshot_blob.bin
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/lib
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/lib/libXss.so.1
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/lib/libXtst.so.6
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/lib/libappindicator.so.1
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/lib/libgconf-2.so.4
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/lib/libindicator.so.7
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/lib/libnotify.so.4
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/128x128
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/128x128/apps
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/128x128/apps/org-preview.png
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/16x16
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/16x16/apps
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/16x16/apps/org-preview.png
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/256x256
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/256x256/apps
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/256x256/apps/org-preview.png
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/32x32
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/32x32/apps
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/32x32/apps/org-preview.png
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/48x48
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/48x48/apps
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/48x48/apps/org-preview.png
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/64x64
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/64x64/apps
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/icons/hicolor/64x64/apps/org-preview.png
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/mime
+/tmp/appimage_extracted_256
+DevTools listening on ws://127.0.0.1:9333/devtools/browser/6ee5dc9e-7f11-4e8c-92c6-6dd225de375b
+[982443:0908/141654.232868:ERROR:ui/ozone/platform/wayland/gpu/wayland_surface_factory.cc:249] '--ozone-platform=wayland' is not compatible with Vulkan. Consider switching to '--ozone-platform=x11' or disabling Vulkan
+Error occurred in handler for 'document:path': Error: This prototype supports files up to 4 MB.
+    at readDocument (/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources/app.asar/electron/documents.cjs:13:38)
+    at async openDocument (/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources/app.asar/electron/main.cjs:14:15)
+    at async /tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources/app.asar/electron/main.cjs:36:18
+    at async Session.<anonymous> (node:electron/js2c/browser_init:2:123634)
+Error occurred in handler for 'document:path': Error: Choose an .org file.
+    at readDocument (/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources/app.asar/electron/documents.cjs:7:94)
+    at openDocument (/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources/app.asar/electron/main.cjs:14:21)
+    at /tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/resources/app.asar/electron/main.cjs:36:24
+    at Session.<anonymous> (node:electron/js2c/browser_init:2:123650)
+    at Session.emit (node:events:514:28)
+894b8ec0b3620cb4d54327127c4f1/usr/share/mime/packages
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/usr/share/mime/packages/org-preview.xml
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/v8_context_snapshot.bin
+/tmp/appimage_extracted_256894b8ec0b3620cb4d54327127c4f1/vk_swiftshader_icd.json

@@ -93,13 +93,19 @@ chmod +x release/*.AppImage
 Use the actual filename generated in =release/=. You can also extract the
 =.tar.gz= and run its =org-preview= executable. The archive avoids a FUSE
 requirement. If AppImage reports a FUSE error on Arch, install =fuse2= or use
-[[https://docs.appimage.org/user-guide/troubleshooting/fuse.html][AppImage's extract-and-run option]].
+[[https://docs.appimage.org/user-guide/troubleshooting/fuse.html][AppImage's extract-and-run option]]:
+
+#+begin_src sh
+./release/Org\ Preview-0.1.0.AppImage --appimage-extract-and-run --ozone-platform=wayland ~/notes/today.org
+#+end_src
 
 Electron uses the Linux desktop's display stack. For a Wayland session you
 can pass =--ozone-platform=wayland= to the executable. If a compositor has
 problems, test =--ozone-platform=x11= through XWayland. Do not run as root.
 Omarchy/Hyprland needs a manual smoke test on a real desktop. CI exercises
 Linux under Xvfb, which does not establish Wayland compatibility.
+See [[file:LINUX-TESTING.org][Linux testing results]] for the real Omarchy test run, fixes, screenshots,
+and remaining environment limitations.
 
 * What v0.1 renders
 - Document title, subtitle, author, headings, and outline navigation.
@@ -131,9 +137,11 @@ On a headless Linux machine, run the desktop smoke test with
 
 GitHub Actions runs tests, desktop smoke checks, and packaging on macOS and
 Linux. Successful runs provide prototype installers as workflow artifacts.
-The smoke test checks rendering, source view, themes, document search, file
-opening, saves, atomic replacement, delete/recreate recovery, and sandboxed
-rendering. Screenshots are saved in =test-results/=.
+The smoke test requires Chromium sandboxing and checks rendering, source
+view, themes, search and scroll preservation, Unicode file opening,
+file-backed drops, input errors, CLI handoff, saves, atomic replacement,
+delete/recreate recovery, watcher switching, and supported-link dispatch.
+Screenshots are saved in =test-results/=.
 
 | Path                   | Purpose                            |
 |------------------------+------------------------------------|

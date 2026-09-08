@@ -1,0 +1,19 @@
+
+> org-preview@0.1.0 test:smoke
+> npm run build && node scripts/smoke.mjs --ozone-platform=x11
+
+
+> org-preview@0.1.0 build
+> vite build
+
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 109 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  4.06 kB │ gzip:  1.56 kB
+dist/assets/index-BcEKi8JR.css  10.29 kB │ gzip:  2.92 kB
+dist/assets/index-A8jvM4n7.js   72.39 kB │ gzip: 26.44 kB
+
+✓ built in 50ms
+Desktop smoke passed: open, file-backed drops, Unicode paths, input errors, CLI handoff, render, source, themes, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, sandbox, and HTML safety.
