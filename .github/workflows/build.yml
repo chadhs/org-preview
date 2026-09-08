@@ -49,9 +49,7 @@ jobs:
         env:
           CSC_FOR_PULL_REQUEST: 'true'
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-          CSC_LINK: ''
-          CSC_KEY_PASSWORD: ''
-        run: npm run dist:mac -- -c.mac.identity=- -c.mac.notarize=false
+        run: env -u CSC_LINK -u CSC_KEY_PASSWORD -u CSC_NAME npm run dist:mac -- -c.mac.identity=- -c.mac.notarize=false
       - name: Package Linux prototype
         if: runner.os == 'Linux'
         run: npm run dist:linux
