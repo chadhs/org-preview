@@ -1,0 +1,73 @@
+#+title: Org Preview release information
+
+* Release policy
+Each push to =main= publishes a new minor release after both platform checks
+pass. The first version is =0.1.0=, followed by =0.2.0=, =0.3.0=, and so on.
+The GitHub release page contains the exact version, changes, downloads,
+and checksums. Pull requests do not publish releases.
+
+* A live reader for Org files
+Org Preview opens local =.org= files and refreshes the document when you
+save in your editor. It runs on macOS and Linux without requiring Emacs,
+an account, or a cloud service.
+
+The application includes:
+- Native file picking, drag and drop, and command-line opening.
+- Live updates after normal saves, atomic saves, and deletion/recreation.
+- An outline, document search, read-only source view, zoom, and themes.
+- Headings, emphasis, tasks, tags, lists, checkboxes, tables, and code blocks.
+- HTTP/HTTPS/mailto links and common internal heading links.
+- An Org heading icon and Linux desktop entries with window matching,
+  searchable keywords, Org MIME types, and local file-URL handling.
+
+Document code and embedded HTML never execute. The renderer is sandboxed,
+and documents cannot load remote resources. Web links open in your browser;
+mail links open your mail client. No telemetry is included.
+
+* Downloads
+Replace =VERSION= below with the version shown on the GitHub release page.
+
+| Platform                 | Package                          |
+|--------------------------+----------------------------------|
+| macOS, Apple Silicon     | Org Preview-VERSION-arm64.dmg       |
+| macOS, Apple Silicon     | Org Preview-VERSION-arm64-mac.zip   |
+| Linux, x86_64            | Org Preview-VERSION.AppImage        |
+| Linux, x86_64            | org-preview-VERSION.tar.gz          |
+
+Builds include a platform-specific =SHA256SUMS-*.txt= file. Compare a
+package's SHA-256 with that file before installing. On macOS use
+=shasum -a 256 <filename>=; on Linux use =sha256sum <filename>=.
+
+* Install and update
+The [[file:README.org][README installation guide]] covers both platforms step by step:
+- macOS Applications installation, unsigned-app approval, and Finder opening.
+- Omarchy's FUSE-free tar installation, CLI shortcut, and optional app launcher.
+- AppImage alternatives, checksum verification, updates, and first use.
+
+Downloaded releases need no Node.js, npm, or Emacs. Omarchy was the native
+Linux test platform, with both Wayland and XWayland verified. There is no
+AUR or pacman package yet.
+
+* Known limits
+- One document at a time, UTF-8, up to 4 MB.
+- This is a reader. Keep editing in your existing editor.
+- Org rendering covers the documented subset, not full Emacs export parity.
+- Local images and links to other files, math, diagrams, Babel, remote
+  includes, agenda features, Quick Look, and automatic updates are excluded.
+- Direct FUSE-mounted AppImage launch was not tested on the Omarchy machine,
+  which lacks FUSE 2. Extract-and-run and tar execution passed.
+- Intel macOS and other architectures have no verified binaries in this release.
+- Multiple registered Mac app copies can confuse Finder's generic Open With
+  entry. Selecting the exact app works; single-copy installation still needs
+  the maintainer's final check.
+
+* Validation and license
+The implementation has passed automated checks on macOS and Linux, real
+Omarchy Wayland/XWayland testing, and Mac native checks. The user verified
+Finder dragging and Mac keyboard shortcuts. CI tests the Mac ZIP application
+and validates the extracted AppImage's desktop entry, icon, and sandbox flags.
+The README summarizes platform verification. Automated tests stay in the
+repository; per-run screenshots and build logs are CI artifacts.
+
+Org Preview and its artwork use BSD-3-Clause. The Org parser, Orga, uses MIT.
+Bundled dependencies retain their licenses in =THIRD-PARTY-NOTICES.org=.

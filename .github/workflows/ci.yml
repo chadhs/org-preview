@@ -1,0 +1,10 @@
+name: Desktop checks
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  desktop:
+    uses: ./.github/workflows/build.yml
