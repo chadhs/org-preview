@@ -143,6 +143,12 @@ file-backed drops, input errors, CLI handoff, saves, atomic replacement,
 delete/recreate recovery, watcher switching, and supported-link dispatch.
 Screenshots are saved in =test-results/=.
 
+The smoke test uses a disposable profile. To test a packaged executable, set
+=ORG_PREVIEW_EXECUTABLE= to its absolute path and run =node scripts/smoke.mjs=.
+On macOS it also checks Finder-style file events and the native Open command
+after the last window closes. CI runs this suite against the macOS ZIP artifact.
+See [[file:MACOS-TESTING.org][macOS testing results]] for native checks and remaining limitations.
+
 | Path                   | Purpose                            |
 |------------------------+------------------------------------|
 | =electron/main.cjs=    | Window, file opening, and safe IPC  |

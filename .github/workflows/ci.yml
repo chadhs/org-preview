@@ -33,6 +33,12 @@ jobs:
       - name: Package Linux prototype
         if: runner.os == 'Linux'
         run: npm run dist:linux
+      - name: Smoke test the macOS ZIP artifact
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p "$RUNNER_TEMP/org-preview-packaged"
+          ditto -xk release/*.zip "$RUNNER_TEMP/org-preview-packaged"
+          ORG_PREVIEW_EXECUTABLE="$RUNNER_TEMP/org-preview-packaged/Org Preview.app/Contents/MacOS/Org Preview" node scripts/smoke.mjs
       - uses: actions/upload-artifact@v7.0.1
         with:
           name: org-preview-${{ runner.os }}-${{ runner.arch }}

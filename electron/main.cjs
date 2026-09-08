@@ -25,10 +25,20 @@ async function openDocument(filePath) {
   app.addRecentDocument(doc.path);
   return doc;
 }
+function requestDocument(filePath) {
+  if (!win) {
+    pendingPath = filePath;
+    if (!win && app.isReady()) createWindow();
+  } else {
+    openDocument(filePath).catch(fail);
+  }
+  win?.restore();
+  win?.focus();
+}
 async function picker() {
-  const { canceled, filePaths } = await dialog.showOpenDialog(win, { properties: ['openFile'], filters: [{ name: 'Org documents', extensions: ['org'] }] });
-  if (!canceled && filePaths[0]) return openDocument(filePaths[0]);
-  return null;
+  const options = { properties: ['openFile'], filters: [{ name: 'Org documents', extensions: ['org'] }] };
+  const { canceled, filePaths } = await (win ? dialog.showOpenDialog(win, options) : dialog.showOpenDialog(options));
+  if (!canceled && filePaths[0]) requestDocument(filePaths[0]);
 }
 function handle(channel, callback) {
   ipcMain.handle(channel, async (event, ...args) => {
@@ -40,17 +50,17 @@ function createWindow() {
   win = new BrowserWindow({ width: 1240, height: 850, minWidth: 720, minHeight: 500, backgroundColor: '#f8f7f3', title: 'Org Preview', webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true } });
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   win.webContents.on('will-navigate', (event) => event.preventDefault());
-  win.on('closed', () => { stopWatching?.(); win = undefined; current = undefined; });
+  win.on('closed', () => { openRevision++; stopWatching?.(); win = undefined; current = undefined; });
   win.loadFile(path.join(__dirname, '../dist/index.html'));
 }
 const locked = app.requestSingleInstanceLock();
 if (!locked) app.quit();
 else {
-  app.on('open-file', (event, filePath) => { event.preventDefault(); if (win) openDocument(filePath).catch(fail); else pendingPath = filePath; });
+  app.on('open-file', (event, filePath) => { event.preventDefault(); requestDocument(filePath); });
   app.on('second-instance', (_event, argv, cwd) => {
     const filePath = documentArgument(argv, app.isPackaged);
-    if (!win) { pendingPath = filePath && path.resolve(cwd, filePath); createWindow(); }
-    else if (filePath) openDocument(path.resolve(cwd, filePath)).catch(fail);
+    if (filePath) requestDocument(path.resolve(cwd, filePath));
+    else if (!win) createWindow();
     win?.restore(); win?.focus();
   });
   app.whenReady().then(() => {

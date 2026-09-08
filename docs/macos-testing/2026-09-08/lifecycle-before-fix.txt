@@ -1,0 +1,29 @@
+
+> org-preview@0.1.0 test:smoke
+> npm run build && node scripts/smoke.mjs
+
+
+> org-preview@0.1.0 build
+> vite build
+
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 109 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  4.06 kB │ gzip:  1.57 kB
+dist/assets/index-BcEKi8JR.css  10.29 kB │ gzip:  2.92 kB
+dist/assets/index-CzxH3Mpy.js   72.57 kB │ gzip: 26.51 kB
+
+✓ built in 118ms
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+electronApplication.waitForEvent: Timeout 5000ms exceeded while waiting for event "window"
+    at /Users/chadhs/src/chadhs/org-preview/scripts/smoke.mjs:118:26 {
+  log: [],
+  name: 'TimeoutError'
+}
+
+Node.js v24.20.0

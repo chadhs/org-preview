@@ -8,12 +8,15 @@ const directory = await mkdtemp(path.join(tmpdir(), 'org-preview-smoke-'));
 const file = path.join(directory, 'smoke café 日本語.org');
 await writeFile(file, '#+title: Desktop smoke test\n* TODO A heading :test:\nRead *this* in Org.\n- [X] Working\n\n#+begin_export html\n<img src=x onerror="window.compromised=true">\n#+end_export');
 await writeFile(path.join(directory, 'links.org'), '#+title: Links\n* Supported\n[[http://example.com][HTTP]] [[https://example.com][HTTPS]] [[mailto:reader@example.invalid][Mail]]');
+const executablePath = process.env.ORG_PREVIEW_EXECUTABLE;
+const appArgs = executablePath ? [] : ['.'];
+const profileArg = `--user-data-dir=${path.join(directory, 'profile')}`;
 let app;
 try {
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  app = await electron.launch({ args: ['.', file, ...process.argv.slice(2)], env, chromiumSandbox: true });
-  const window = await app.firstWindow();
+  app = await electron.launch({ executablePath, args: [...appArgs, file, profileArg, ...process.argv.slice(2)], env, chromiumSandbox: true });
+  let window = await app.firstWindow();
   expect(app.process().spawnargs).not.toContain('--no-sandbox');
   expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences().sandbox)).toBe(true);
   const errors = [];
@@ -90,7 +93,7 @@ try {
   await expect(window.locator('#error')).toBeHidden();
   await expect(window.locator('#filename')).toHaveText(path.basename(file));
   // A second CLI invocation must report bad input instead of ignoring it.
-  const child = spawn(app.process().spawnfile, ['.', unsupported], { env, stdio: 'ignore' });
+  const child = spawn(app.process().spawnfile, [...appArgs, unsupported, profileArg], { env, stdio: 'ignore' });
   await new Promise((resolve, reject) => {
     child.once('error', reject);
     child.once('exit', (code) => code === 0 ? resolve() : reject(new Error(`Second instance exited ${code}`)));
@@ -103,13 +106,38 @@ try {
   await writeFile(file, '#+title: Old file must stay detached');
   await new Promise((resolve) => setTimeout(resolve, 650));
   await expect(window.locator('#document-title')).toHaveText('Your words, in Org.');
+  if (process.platform === 'darwin') {
+    // macOS keeps the application alive after its last window closes. A Finder
+    // open-file event must create a window without waiting for an activate event.
+    await app.evaluate(({ BrowserWindow }) => new Promise((resolve) => {
+      const closing = BrowserWindow.getAllWindows()[0];
+      closing.once('closed', resolve);
+      closing.close();
+    }));
+    expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length)).toBe(0);
+    const reopened = app.waitForEvent('window', { timeout: 5000 });
+    await app.evaluate(({ app }, filePath) => app.emit('open-file', { preventDefault() {} }, filePath), file);
+    window = await reopened;
+    await expect(window.locator('#document-title')).toHaveText('Old file must stay detached');
+    // Open remains usable from the native menu with no windows, too.
+    await app.evaluate(({ BrowserWindow }) => new Promise((resolve) => {
+      const closing = BrowserWindow.getAllWindows()[0];
+      closing.once('closed', resolve);
+      closing.close();
+    }));
+    const picked = app.waitForEvent('window', { timeout: 5000 });
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().items.find((item) => item.label === 'File').submenu.items[0].click());
+    window = await picked;
+    await expect(window.locator('#document-title')).toHaveText('Your words, in Org.');
+  }
   await mkdir('test-results', { recursive: true });
-  await window.screenshot({ path: 'test-results/desktop-light.png' });
+  const screenshotPrefix = executablePath ? 'packaged' : 'desktop';
+  await window.screenshot({ path: `test-results/${screenshotPrefix}-light.png` });
   await window.locator('#theme').selectOption('dark');
-  await window.screenshot({ path: 'test-results/desktop-dark.png' });
+  await window.screenshot({ path: `test-results/${screenshotPrefix}-dark.png` });
   await window.locator('#theme').selectOption('system');
   expect(errors).toEqual([]);
-  console.log('Desktop smoke passed: open, file-backed drops, Unicode paths, input errors, CLI handoff, render, source, themes, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, sandbox, and HTML safety.');
+  console.log(`Desktop smoke passed (${executablePath ? 'packaged' : 'development'}): open, file-backed drops, Unicode paths, input errors, CLI handoff${process.platform === 'darwin' ? ', macOS window reopening' : ''}, render, source, themes, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, sandbox, and HTML safety.`);
 } finally {
   await app?.close();
   await rm(directory, { recursive: true, force: true });

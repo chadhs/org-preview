@@ -1,0 +1,132 @@
+#+title: macOS testing
+#+date: 2026-09-08
+
+* Result
+The development app and the application extracted from the macOS ZIP pass
+the sandboxed desktop suite. Native picking and Finder Open With work with
+spaces and Unicode. The user verified an actual Finder-to-preview drag.
+HTTP and HTTPS links open Safari, and mailto opens Mail with the expected
+recipient and subject. The disposable message was discarded without sending.
+
+Testing started at Linux handoff =8dbe922=. The Mac checkout was clean and
+fast-forwarded from =c6ce0e7= after inspecting local and remote history.
+No Mac changes were discarded. No merge to main or release publication was
+performed. Project code remains BSD-3-Clause; Orga remains MIT-licensed.
+No dependency or lockfile changes were needed.
+
+* Machine and toolchain
+| Item             | Observed value       |
+|------------------+----------------------|
+| macOS            | 26.6.2, build 25G83   |
+| Architecture     | Apple Silicon, arm64 |
+| Node             | 24.20.0              |
+| npm              | 11.19.0              |
+| Electron         | 44.2.0               |
+| Orga             | 4.7.1                |
+| Default browser  | Safari               |
+| Default mail app | Mail                 |
+
+Commands selected Node 24 through =/opt/homebrew/opt/node@24/bin= without
+changing the default global Node selection. GitHub commands used the
+checkout's direnv. No app instances were running before the initial clean
+install and required checks. Later smoke runs used disposable profiles so
+they could not reuse the manually tested window or alter its preferences.
+
+* Automated and artifact checks
+| Check                              | Result                              |
+|------------------------------------+-------------------------------------|
+| npm ci                             | Pass                                |
+| npm run check                      | Pass, 9 tests and production build  |
+| npm run test:smoke                 | Pass with Chromium sandbox required |
+| npm run dist:mac                   | Pass, arm64 DMG and ZIP              |
+| ZIP-extracted executable smoke    | Pass against the final artifact     |
+| DMG integrity verification         | Pass                                |
+| Last-window open-file regression  | Failed before fix; passes after fix |
+| Last-window native Open handler   | Pass after fix                      |
+
+The full desktop suite exercises file-backed Chromium drops, Unicode
+paths, invalid extensions, files over 4 MB, second-instance CLI handoff,
+rendering, source view, light/dark/system themes, search, active-match and
+scroll preservation, normal saves, atomic replacement, delete/recreate
+recovery, and watcher detachment after switching files. It also checks
+supported-link dispatch with a stubbed OS opener and inert embedded HTML.
+Real browser and mail integration were tested separately.
+
+Every accepted smoke launch sets =chromiumSandbox: true= and checks that
+its process arguments omit =--no-sandbox= and its renderer preferences
+keep sandboxing enabled. No sandbox override was used. The ZIP test ran
+the actual extracted executable, not =release/mac-arm64= or the source tree.
+
+* Native checks
+Disposable files were kept under =/private/tmp/org-preview-macos-fixtures=,
+including =notes café 日本語.org= and =second file Ω.org=.
+
+| Check                          | Observation                           |
+|--------------------------------+---------------------------------------|
+| Development native picker      | Opens the Unicode/spaced fixture      |
+| Packaged native picker         | Opens the fixture through the OS sheet |
+| Development keyboard shortcuts | Command-O, Command-F, Enter search, and Command-Shift-S pass |
+| Finder Open With, exact app    | Opens second file Ω.org in the ZIP app |
+| Native Finder drag             | User confirmed the file opens correctly |
+| Actual HTTPS link              | Opens https://orgmode.org in Safari   |
+| Actual HTTP link               | Opens Example Domain in Safari       |
+| Actual mailto link             | Opens reader@example.invalid with subject "Org Preview test" in Mail |
+| Last-window close              | Native close control leaves no renderer pages |
+| Packaged keyboard shortcuts    | User verification pending            |
+
+Finder lists Org Preview as an available Org viewer, while Emacs remains
+the default. The tests did not change the default file handler. Multiple
+copies of Org Preview exist on this development Mac. The generic Open With
+entry sometimes reached the welcome document instead of the selected file.
+Selecting the exact extracted bundle through Open With > Other opened the
+requested file. Generic routing between several registered copies remains
+an environment-specific limitation; normal installation with one copy was
+not tested.
+
+Native coordinate automation reported =noWindowsAvailable= for cross-window
+drags, so its failed drag attempts are excluded as application failures.
+The user independently dragged the named fixture into the packaged app and
+confirmed success. Native keyboard automation was reliable in the development
+picker workflow but inconsistent when targeting multiple packaged copies.
+The table separates verified shortcuts from pending manual checks.
+
+* Confirmed defect fixed
+macOS keeps the process alive after its last window closes. The prior
+=open-file= handler only saved the requested path when no window existed.
+Without a separate =activate= event, the file remained invisible. A regression
+in the real Electron process reproduced this by closing its last window,
+waiting for =closed=, then emitting =open-file=. It timed out waiting for a
+new window before the fix.
+
+File requests now create a window when the app is ready and has none.
+Startup requests remain queued until readiness. The native Open command
+also supports a parentless picker and creates a document window after a
+file is selected. Closing a window invalidates unfinished reads so an old
+request cannot recreate the previous document watcher after closure.
+
+The smoke suite now checks both no-window paths on macOS, accepts an
+=ORG_PREVIEW_EXECUTABLE= path for packaged testing, and uses a disposable
+profile for both its primary and secondary CLI processes. CI runs the same
+suite against the extracted macOS ZIP in addition to the development app.
+
+* Remaining limits
+- Builds are unsigned and unnotarized prototypes. Gatekeeper behavior for a
+  downloaded quarantined distribution was not tested or bypassed.
+- The DMG passes integrity verification; the ZIP-extracted application was
+  the artifact used for full runtime testing.
+- The default Electron icon is still present. Branding, signing, and release
+  distribution were not added during this test pass.
+- Intel macOS hardware was not available. These results cover Apple Silicon.
+- Generic Finder routing with multiple registered app copies and the remaining
+  packaged keyboard shortcuts need the follow-up described above.
+- Existing v0.1 exclusions remain, including editing, Babel execution, remote
+  includes, full Org export parity, math/diagrams, local image/file links,
+  Quick Look, synchronization, signing, and automatic updates.
+
+* Evidence
+Logs, artifact checksums, and packaged light/dark screenshots are under
+[[file:docs/macos-testing/2026-09-08/][docs/macos-testing/2026-09-08/]].
+The pre-fix lifecycle timeout is retained beside successful final runs.
+Additional local logs remain in =test-results/macos/=, and build artifacts
+remain in =release/=. Native UI observations and the user-confirmed drag
+are recorded above; the committed screenshots come from the desktop suite.
