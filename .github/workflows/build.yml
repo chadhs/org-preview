@@ -1,0 +1,81 @@
+name: Build and test desktop packages
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        default: ''
+        required: false
+permissions:
+  contents: read
+jobs:
+  desktop:
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Stamp the release version
+        if: inputs.version != ''
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: node scripts/release.mjs stamp "$RELEASE_VERSION"
+      - run: npm ci
+      - run: npm run check
+      - name: Desktop smoke test on macOS
+        if: runner.os == 'macOS'
+        run: npm run test:smoke
+      - name: Desktop smoke test on Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum npm run test:smoke
+      - name: Package macOS prototype
+        if: runner.os == 'macOS'
+        run: npm run dist:mac
+      - name: Package Linux prototype
+        if: runner.os == 'Linux'
+        run: npm run dist:linux
+      - name: Validate the Linux AppImage launcher
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y desktop-file-utils
+          mkdir -p "$RUNNER_TEMP/org-preview-appimage"
+          cd "$RUNNER_TEMP/org-preview-appimage"
+          appimages=("$GITHUB_WORKSPACE"/release/*.AppImage)
+          test "${#appimages[@]}" -eq 1
+          "${appimages[0]}" --appimage-extract > /dev/null
+          desktop-file-validate squashfs-root/org-preview.desktop
+          node "$GITHUB_WORKSPACE/scripts/check-linux-desktop.mjs" squashfs-root
+      - name: Smoke test the macOS ZIP artifact
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p "$RUNNER_TEMP/org-preview-packaged"
+          ditto -xk release/*.zip "$RUNNER_TEMP/org-preview-packaged"
+          ORG_PREVIEW_EXECUTABLE="$RUNNER_TEMP/org-preview-packaged/Org Preview.app/Contents/MacOS/Org Preview" node scripts/smoke.mjs
+      - name: Generate package checksums
+        run: npm run checksums
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: org-preview-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
+            release/*.tar.gz
+            release/SHA256SUMS-*.txt
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7.0.1
+        if: always()
+        with:
+          name: screenshots-${{ runner.os }}
+          path: test-results/*.png
+          if-no-files-found: ignore

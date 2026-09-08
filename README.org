@@ -89,7 +89,7 @@ Build on Linux, then run the AppImage as your normal desktop user.
 
 #+begin_src sh
 chmod +x release/*.AppImage
-./release/Org\ Preview-0.1.0.AppImage ~/notes/today.org
+./release/Org\ Preview-VERSION.AppImage ~/notes/today.org
 #+end_src
 
 Use the actual filename generated in =release/=. You can also extract the
@@ -98,7 +98,7 @@ requirement. If AppImage reports a FUSE error on Arch, install =fuse2= or use
 [[https://docs.appimage.org/user-guide/troubleshooting/fuse.html][AppImage's extract-and-run option]]:
 
 #+begin_src sh
-./release/Org\ Preview-0.1.0.AppImage --appimage-extract-and-run --ozone-platform=wayland ~/notes/today.org
+./release/Org\ Preview-VERSION.AppImage --appimage-extract-and-run --ozone-platform=wayland ~/notes/today.org
 #+end_src
 
 Electron uses the Linux desktop's display stack. For a Wayland session you
@@ -110,6 +110,36 @@ can use them to add a launcher. The portable tar archive does not install
 a launcher or change file associations.
 See [[file:LINUX-TESTING.org][Linux testing results]] for the real Omarchy test run, fixes, screenshots,
 and remaining environment limitations.
+
+* Automatic releases
+Every push to =main=, including merge, squash, and rebase merges, starts a
+minor release. Documentation-only merges also release. The first version is
+=0.1.0=; subsequent versions increment the highest stable tag's minor number
+and reset its patch number, for example =0.2.0= and =0.3.0=.
+
+PRs and manual Desktop checks runs only validate builds. Main releases use
+the same build workflow, stamp the selected version into both package files,
+and require all tests, platform builds, and artifact checks to pass before
+publishing. The app's version label follows that stamped version.
+
+Release runs queue instead of canceling earlier pending merges. GitHub can
+queue up to 100 pending runs. Do not use =[skip ci]= markers on main commits;
+GitHub skips those runs before the release workflow can start.
+
+Only the publisher job has repository write permission. It checks all four
+packages against their checksums, creates a versioned source commit and tag,
+uploads six assets to a draft, then publishes after every upload succeeds.
+The tagged commit has the merged main commit as its parent. It updates only
+the package versions, so checking out a tag reproduces the released version.
+The workflow never pushes a version-bump commit back to =main= or triggers
+a release loop. Main's package version is the development baseline.
+
+If a run fails, fix the cause and rerun it in Actions. A retry reuses any tag
+already assigned to that source commit and completes a partial draft.
+Published releases and their assets are left untouched. An older draft retry
+will not replace a newer release as GitHub's latest release. Failed builds
+publish nothing. Generated release notes list changes since the previous tag
+and include version-specific installation instructions and known limits.
 
 * What v0.1 renders
 - Document title, subtitle, author, headings, and outline navigation.
@@ -165,7 +195,7 @@ See [[file:MACOS-TESTING.org][macOS testing results]] for native checks and rema
 | =examples/welcome.org= | A notebook to try on first launch |
 
 The first commit contains only this project's original goal and scope.
-See [[file:RELEASE-NOTES.org][v0.1.0 release notes]] for packages, installation instructions, and known limits.
+See [[file:RELEASE-NOTES.org][release information]] for packages, installation instructions, and known limits.
 
 * License and acknowledgments
 The project uses the [[file:LICENSE][BSD 3-Clause license]]. The [[https://github.com/orgapp/orgajs][Orga]] parser is MIT-licensed.

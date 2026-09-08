@@ -1,6 +1,8 @@
 #+title: Mac development handoff
 
-Copy the prompt below into the development session on the Mac.
+Historical handoff from the initial prototype test pass. The branch and
+manual publication instructions below are retained as history; current
+release behavior is documented in README.org.
 
 #+begin_example
 Continue org-preview development on this Mac after its real Linux test pass.

@@ -1,15 +1,17 @@
-#+title: Org Preview v0.1.0
+#+title: Org Preview release information
 
-* Publication status
-Prepared for the first release. Publish after the PR is merged and the
-maintainer completes installation testing. No release has been published.
+* Release policy
+Each push to =main= publishes a new minor release after both platform checks
+pass. The first version is =0.1.0=, followed by =0.2.0=, =0.3.0=, and so on.
+The GitHub release page contains the exact version, changes, downloads,
+and checksums. Pull requests do not publish releases.
 
 * A live reader for Org files
 Org Preview opens local =.org= files and refreshes the document when you
 save in your editor. It runs on macOS and Linux without requiring Emacs,
 an account, or a cloud service.
 
-This first release includes:
+The application includes:
 - Native file picking, drag and drop, and command-line opening.
 - Live updates after normal saves, atomic saves, and deletion/recreation.
 - An outline, document search, read-only source view, zoom, and themes.
@@ -23,12 +25,14 @@ and documents cannot load remote resources. Web links open in your browser;
 mail links open your mail client. No telemetry is included.
 
 * Downloads
+Replace =VERSION= below with the version shown on the GitHub release page.
+
 | Platform                 | Package                          |
 |--------------------------+----------------------------------|
-| macOS, Apple Silicon     | Org Preview-0.1.0-arm64.dmg       |
-| macOS, Apple Silicon     | Org Preview-0.1.0-arm64-mac.zip   |
-| Linux, x86_64            | Org Preview-0.1.0.AppImage        |
-| Linux, x86_64            | org-preview-0.1.0.tar.gz          |
+| macOS, Apple Silicon     | Org Preview-VERSION-arm64.dmg       |
+| macOS, Apple Silicon     | Org Preview-VERSION-arm64-mac.zip   |
+| Linux, x86_64            | Org Preview-VERSION.AppImage        |
+| Linux, x86_64            | org-preview-VERSION.tar.gz          |
 
 Builds include a platform-specific =SHA256SUMS-*.txt= file. Compare a
 package's SHA-256 with that file before installing. On macOS use
@@ -41,25 +45,25 @@ the intended app. Launch it and use Open file, or choose Org Preview in
 Finder's Open With menu for an =.org= document.
 
 These builds are unsigned and unnotarized. macOS may block the first launch.
-Installation from a downloaded, quarantined artifact remains part of the
-maintainer's acceptance test before publication. Signing and notarization
-are outside this release's scope.
+The automated build does not exercise Gatekeeper approval for a downloaded,
+quarantined artifact; consult the macOS testing report for that limitation. Signing and notarization
+are outside the current scope.
 
 ** Linux and Omarchy
 Make the AppImage executable, then launch it as your normal desktop user.
 
 #+begin_src sh
-chmod +x 'Org Preview-0.1.0.AppImage'
-./Org\ Preview-0.1.0.AppImage ~/notes/today.org
+chmod +x 'Org Preview-VERSION.AppImage'
+./Org\ Preview-VERSION.AppImage ~/notes/today.org
 #+end_src
 
 If FUSE 2 is unavailable, use extract-and-run or the tar archive:
 
 #+begin_src sh
-./Org\ Preview-0.1.0.AppImage --appimage-extract-and-run ~/notes/today.org
+./Org\ Preview-VERSION.AppImage --appimage-extract-and-run ~/notes/today.org
 
-tar -xzf org-preview-0.1.0.tar.gz
-./org-preview-0.1.0/org-preview ~/notes/today.org
+tar -xzf org-preview-VERSION.tar.gz
+./org-preview-VERSION/org-preview ~/notes/today.org
 #+end_src
 
 The AppImage includes a desktop entry and icons for desktop integration

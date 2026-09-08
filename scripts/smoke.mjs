@@ -1,5 +1,5 @@
 import { _electron as electron, expect } from '@playwright/test';
-import { mkdtemp, writeFile, rename, rm, mkdir } from 'node:fs/promises';
+import { mkdtemp, writeFile, rename, rm, mkdir, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
@@ -23,6 +23,7 @@ try {
   const errors = [];
   window.on('pageerror', (error) => errors.push(error.message));
   await expect(window.locator('#document-title')).toHaveText('Desktop smoke test');
+  await expect(window.locator('.version')).toHaveText(JSON.parse(await readFile('package.json', 'utf8')).version);
   await expect(window.locator('#outline .outline-item')).toHaveCount(1);
   await expect(window.locator('#content strong')).toHaveText('this');
   await expect(window.locator('#content img')).toHaveCount(0);

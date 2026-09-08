@@ -1,10 +1,12 @@
 import DOMPurify from 'dompurify';
+import { version as appVersion } from '../package.json';
 import { renderOrg } from './org.js';
 import './style.css';
 import { createSearch } from './search.js';
 
 const $ = (selector) => document.querySelector(selector);
 const api = window.orgPreview;
+$('.version').textContent = appVersion;
 let current;
 let sourceMode = false;
 const finder = createSearch(() => $(sourceMode ? '#source' : '#document'), $('#reader'), (text) => { $('#search-count').textContent = text; });

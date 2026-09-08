@@ -1,69 +1,10 @@
 name: Desktop checks
 on:
-  push:
-    branches: [main, MVP-v0.1]
   pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   desktop:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, ubuntu-22.04]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-node@v7.0.0
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm run check
-      - name: Desktop smoke test on macOS
-        if: runner.os == 'macOS'
-        run: npm run test:smoke
-      - name: Desktop smoke test on Linux
-        if: runner.os == 'Linux'
-        run: xvfb-run --auto-servernum npm run test:smoke
-      - name: Package macOS prototype
-        if: runner.os == 'macOS'
-        run: npm run dist:mac
-      - name: Package Linux prototype
-        if: runner.os == 'Linux'
-        run: npm run dist:linux
-      - name: Validate the Linux AppImage launcher
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y desktop-file-utils
-          mkdir -p "$RUNNER_TEMP/org-preview-appimage"
-          cd "$RUNNER_TEMP/org-preview-appimage"
-          "$GITHUB_WORKSPACE"/release/*.AppImage --appimage-extract > /dev/null
-          desktop-file-validate squashfs-root/org-preview.desktop
-          node "$GITHUB_WORKSPACE/scripts/check-linux-desktop.mjs" squashfs-root
-      - name: Smoke test the macOS ZIP artifact
-        if: runner.os == 'macOS'
-        run: |
-          mkdir -p "$RUNNER_TEMP/org-preview-packaged"
-          ditto -xk release/*.zip "$RUNNER_TEMP/org-preview-packaged"
-          ORG_PREVIEW_EXECUTABLE="$RUNNER_TEMP/org-preview-packaged/Org Preview.app/Contents/MacOS/Org Preview" node scripts/smoke.mjs
-      - name: Generate package checksums
-        run: npm run checksums
-      - uses: actions/upload-artifact@v7.0.1
-        with:
-          name: org-preview-${{ runner.os }}-${{ runner.arch }}
-          path: |
-            release/*.dmg
-            release/*.zip
-            release/*.AppImage
-            release/*.tar.gz
-            release/SHA256SUMS-*.txt
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v7.0.1
-        if: always()
-        with:
-          name: screenshots-${{ runner.os }}
-          path: test-results/*.png
-          if-no-files-found: ignore
+    uses: ./.github/workflows/build.yml
