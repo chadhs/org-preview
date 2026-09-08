@@ -27,7 +27,7 @@ test('version and publication guards reject malformed or non-main inputs', () =>
   for (const version of ['0.01.0', 'v0.1.0', '0.1.0-beta', '1.2', '0.1.0\nfoo', '0.9007199254740992.0']) assert.throws(() => parseVersion(version));
   const valid = { GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'push', GITHUB_REF: 'refs/heads/main' };
   assert.doesNotThrow(() => assertMainRelease(valid));
-  for (const changed of [{ GITHUB_EVENT_NAME: 'pull_request' }, { GITHUB_REF: 'refs/heads/feature' }, { GITHUB_ACTIONS: 'false' }]) assert.throws(() => assertMainRelease({ ...valid, ...changed }), /main push/);
+  for (const changed of [{ GITHUB_EVENT_NAME: 'pull_request' }, { GITHUB_REF: 'refs/heads/feature' }, { GITHUB_ACTIONS: 'false' }]) assert.throws(() => assertMainRelease({ ...valid, ...changed }), /trusted main/);
 });
 
 test('stamping changes both version manifests and preserves dependency data', async () => {
@@ -112,4 +112,16 @@ test('release notes use the actual version and source, without stale publication
   assert.ok(notes.includes(source));
   assert.match(notes, /Merged feature A/);
   assert.doesNotMatch(notes, /MVP-v0\.1|after the PR is merged/);
+});
+
+
+test('manual recovery and merged-PR fallback only allow trusted main events', () => {
+  const main = { GITHUB_ACTIONS: 'true', GITHUB_REF: 'refs/heads/main' };
+  assert.doesNotThrow(() => assertMainRelease({ ...main, GITHUB_EVENT_NAME: 'workflow_dispatch' }));
+  const merged = { ...main, GITHUB_EVENT_NAME: 'pull_request_target', RELEASE_PR_MERGED: 'true', RELEASE_PR_BASE: 'main' };
+  assert.doesNotThrow(() => assertMainRelease(merged));
+  for (const change of [{ RELEASE_PR_MERGED: 'false' }, { RELEASE_PR_BASE: 'feature' }, { GITHUB_REF: 'refs/pull/2/merge' }, { GITHUB_EVENT_NAME: 'pull_request' }]) {
+    assert.throws(() => assertMainRelease({ ...merged, ...change }), /trusted main/);
+  }
+  assert.throws(() => assertMainRelease({ ...main, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/feature' }), /trusted main/);
 });

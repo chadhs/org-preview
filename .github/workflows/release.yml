@@ -2,6 +2,12 @@ name: Release a minor version
 on:
   push:
     branches: [main]
+  # This merged-only fallback is not suppressed by skip markers in squash messages.
+  # Never check out or execute an unmerged PR head in this workflow.
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
 # Keep all pending merges instead of replacing the previous pending run.
 concurrency:
   group: org-preview-main-releases
@@ -12,6 +18,7 @@ permissions:
   contents: read
 jobs:
   plan:
+    if: github.ref == 'refs/heads/main' && (github.event_name != 'pull_request_target' || github.event.pull_request.merged == true)
     timeout-minutes: 5
     runs-on: ubuntu-22.04
     outputs:
@@ -21,6 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
         with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v7.0.0
@@ -29,6 +37,9 @@ jobs:
       - id: plan
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_SOURCE: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
+          RELEASE_PR_MERGED: ${{ github.event.pull_request.merged || false }}
+          RELEASE_PR_BASE: ${{ github.event.pull_request.base.ref || '' }}
         run: node scripts/release.mjs plan
   build:
     needs: plan
@@ -36,9 +47,10 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       version: ${{ needs.plan.outputs.version }}
+      source: ${{ needs.plan.outputs.source }}
   publish:
     needs: [plan, build]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.plan.outputs.published != 'true'
+    if: github.ref == 'refs/heads/main' && needs.plan.outputs.published != 'true' && (github.event_name != 'pull_request_target' || github.event.pull_request.merged == true)
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     permissions:
@@ -61,4 +73,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_SOURCE: ${{ needs.plan.outputs.source }}
           RELEASE_VERSION: ${{ needs.plan.outputs.version }}
+          RELEASE_PR_MERGED: ${{ github.event.pull_request.merged || false }}
+          RELEASE_PR_BASE: ${{ github.event.pull_request.base.ref || '' }}
         run: node scripts/release.mjs publish

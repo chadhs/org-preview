@@ -2,6 +2,10 @@ name: Build and test desktop packages
 on:
   workflow_call:
     inputs:
+      source:
+        type: string
+        default: ''
+        required: false
       version:
         type: string
         default: ''
@@ -19,6 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
         with:
+          ref: ${{ inputs.source || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v7.0.0
         with:

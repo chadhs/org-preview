@@ -3,6 +3,17 @@
 
 [[file:build/icons/128x128.png]]
 
+[[#install][Install on macOS or Omarchy]]
+
+* Screenshots
+Light preview with the document outline:
+
+[[file:docs/screenshots/preview-light.png]]
+
+Dark preview showing Org tables and source blocks:
+
+[[file:docs/screenshots/preview-dark.png]]
+
 * Install
 You do not need Node.js, npm, or Emacs to use a downloaded release.
 Supported downloads are macOS Apple Silicon and Linux x86_64, including
@@ -267,14 +278,23 @@ minor release. Documentation-only merges also release. The first version is
 =0.1.0=; subsequent versions increment the highest stable tag's minor number
 and reset its patch number, for example =0.2.0= and =0.3.0=.
 
-PRs and manual Desktop checks runs only validate builds. Main releases use
+Open PRs and manual Desktop checks runs only validate builds. Main releases use
 the same build workflow, stamp the selected version into both package files,
 and require all tests, platform builds, and artifact checks to pass before
 publishing. The app's version label follows that stamped version.
 
 Release runs queue instead of canceling earlier pending merges. GitHub can
-queue up to 100 pending runs. Do not use =[skip ci]= markers on main commits;
-GitHub skips those runs before the release workflow can start.
+queue up to 100 pending runs. A merged-PR fallback also listens for completed
+merges, so a skip marker inherited by a squash message cannot suppress a
+release. It runs only after merging into main, checks out that exact merged
+commit, and verifies that the commit belongs to main's history. It never
+executes an unmerged PR head. Duplicate push/merge events reuse the same
+release and do not increment the version twice.
+
+For recovery, open Actions → Release a minor version → Run workflow and
+select =main=. This uses the same checks, checksum verification, and retry
+rules. A manual run for an already-published main commit does nothing. Direct
+pushes containing skip markers can be recovered this way too.
 
 Only the publisher job has repository write permission. It checks all four
 packages against their checksums, creates a versioned source commit and tag,
