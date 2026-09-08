@@ -65,7 +65,18 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/org-preview-packaged"
           ditto -xk release/*.zip "$RUNNER_TEMP/org-preview-packaged"
+          codesign --verify --deep --strict --verbose=2 "$RUNNER_TEMP/org-preview-packaged/Org Preview.app"
           ORG_PREVIEW_EXECUTABLE="$RUNNER_TEMP/org-preview-packaged/Org Preview.app/Contents/MacOS/Org Preview" node scripts/smoke.mjs
+      - name: Verify the macOS DMG app signature
+        if: runner.os == 'macOS'
+        run: |
+          mountpoint="$RUNNER_TEMP/org-preview-dmg"
+          mkdir -p "$mountpoint"
+          images=(release/*.dmg)
+          test "${#images[@]}" -eq 1
+          hdiutil attach -readonly -nobrowse -mountpoint "$mountpoint" "${images[0]}"
+          trap 'hdiutil detach "$mountpoint"' EXIT
+          codesign --verify --deep --strict --verbose=2 "$mountpoint/Org Preview.app"
       - name: Generate package checksums
         run: npm run checksums
       - uses: actions/upload-artifact@v7.0.1

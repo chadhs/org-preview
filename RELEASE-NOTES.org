@@ -40,7 +40,7 @@ package's SHA-256 with that file before installing. On macOS use
 
 * Install and update
 The [[file:README.org][README installation guide]] covers both platforms step by step:
-- macOS Applications installation, unsigned-app approval, and Finder opening.
+- macOS Applications installation, app-specific first-launch approval, and Finder opening.
 - Omarchy's FUSE-free tar installation, CLI shortcut, and optional app launcher.
 - AppImage alternatives, checksum verification, updates, and first use.
 

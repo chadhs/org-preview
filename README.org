@@ -46,14 +46,16 @@ Download the matching =SHA256SUMS-darwin-arm64.txt= or
 5. Click *Open file* or press =⌘O= and choose an =.org= file. You can also drag
    a file into the app, or use Finder's *Open With → Org Preview*.
 
-The app is currently unsigned and unnotarized. If macOS says the developer
-cannot be verified or Apple cannot check it, and you trust the download
-from this repository:
+Mac builds use an ad-hoc signature to seal the app's contents. They are not
+Developer-ID-signed or notarized, so Apple does not automatically trust the
+download. You do not need an Apple Developer Program membership to run it.
+If you trust this repository and macOS says it could not verify Org Preview:
 
-1. Try opening the installed app once and dismiss the alert.
+1. Try opening the installed app once and click *Done* on the alert.
 2. Open *System Settings → Privacy & Security*.
 3. Find the message about Org Preview and choose *Open Anyway*, then confirm
-   *Open*. Authenticate if macOS asks. This approves this app specifically.
+   *Open*. Authenticate if macOS asks. This approves this app specifically;
+   Gatekeeper remains enabled for other apps.
 
 See [[https://support.apple.com/en-us/102445][Apple's first-launch instructions]]. If macOS reports a damaged app,
 re-download it and compare its checksum. Report the exact alert if that
@@ -222,7 +224,8 @@ working file-to-preview loop over complete Org export compatibility.
 - An editor, agenda, task manager, or replacement for Emacs.
 - Babel execution, remote includes, or cloud synchronization.
 - Full Org export parity, LaTeX rendering, and diagram engines.
-- Finder Quick Look, signed installers, automatic updates, and an AUR package.
+- Finder Quick Look, Developer ID signing/notarization, automatic updates,
+  and an AUR package.
 
 * Run from source
 Use Node.js 24 LTS and npm. No Emacs installation is needed.
@@ -268,8 +271,9 @@ npm run pack       # Unpacked application for a quick packaging check
 npm run checksums  # SHA-256 sums for the packages in release/
 #+end_src
 
-macOS builds are unsigned prototypes. Signing and notarization are still
-needed before distributing a polished release. The app declares itself as
+macOS builds are ad-hoc signed. CI verifies the signatures inside both ZIP
+and DMG packages. Developer ID signing and notarization are still needed
+for downloads that macOS trusts automatically. The app declares itself as
 an Org file viewer so installed builds can appear in Open With.
 
 * Automatic releases
@@ -354,8 +358,8 @@ On macOS it also checks Finder-style file events and the native Open command
 after the last window closes. CI runs this suite against the macOS ZIP artifact.
 Native Mac checks covered file picking, Finder opening and dragging, browser
 and mail links, and keyboard shortcuts on Apple Silicon. The Mac packages
-are unsigned and unnotarized; downloaded-app approval remains an installation
-check. Keep one installed copy to avoid ambiguous Finder Open With entries.
+are ad-hoc signed and unnotarized; first launch requires app-specific
+approval. Keep one installed copy to avoid ambiguous Finder Open With entries.
 
 Keep the automated tests in =test/= and =scripts/smoke.mjs=: they protect
 rendering, file watching, sandboxing, and release publication. Test fixtures

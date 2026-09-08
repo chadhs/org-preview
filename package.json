@@ -52,9 +52,11 @@
         "zip"
       ],
       "category": "public.app-category.productivity",
-      "identity": null,
+      "identity": "-",
       "icon": "build/icon.icns",
-      "artifactName": "org-preview-${version}-${arch}.${ext}"
+      "artifactName": "org-preview-${version}-${arch}.${ext}",
+      "hardenedRuntime": true,
+      "strictVerify": true
     },
     "linux": {
       "target": [
