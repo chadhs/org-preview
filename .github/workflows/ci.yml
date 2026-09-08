@@ -14,8 +14,8 @@ jobs:
         os: [macos-latest, ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: 24
           cache: npm
@@ -33,7 +33,7 @@ jobs:
       - name: Package Linux prototype
         if: runner.os == 'Linux'
         run: npm run dist:linux
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: org-preview-${{ runner.os }}-${{ runner.arch }}
           path: |
@@ -42,7 +42,7 @@ jobs:
             release/*.AppImage
             release/*.tar.gz
           if-no-files-found: error
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: always()
         with:
           name: screenshots-${{ runner.os }}
