@@ -1,0 +1,50 @@
+name: Desktop checks
+on:
+  push:
+    branches: [main, MVP-v0.1]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Desktop smoke test on macOS
+        if: runner.os == 'macOS'
+        run: npm run test:smoke
+      - name: Desktop smoke test on Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum npm run test:smoke
+      - name: Package macOS prototype
+        if: runner.os == 'macOS'
+        run: npm run dist:mac
+      - name: Package Linux prototype
+        if: runner.os == 'Linux'
+        run: npm run dist:linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: org-preview-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
+            release/*.tar.gz
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots-${{ runner.os }}
+          path: test-results/*.png
+          if-no-files-found: ignore

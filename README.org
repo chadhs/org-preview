@@ -34,10 +34,122 @@ working file-to-preview loop over complete Org export compatibility.
 - Full Org export parity, LaTeX rendering, and diagram engines.
 - Finder Quick Look, signed installers, automatic updates, and an AUR package.
 
-* Development
-The initial commit records the goal and scope. Prototyping happens on
-=MVP-v0.1=, with setup and validation instructions added as the app takes shape.
+* Run the prototype
+Use Node.js 24 LTS and npm. No Emacs installation is needed.
+
+#+begin_src sh
+git clone https://github.com/chadhs/org-preview.git
+cd org-preview
+git switch MVP-v0.1
+npm ci
+npm run dev
+#+end_src
+
+The first launch opens =examples/welcome.org=. Electron downloads its runtime
+on first use, so installation and that first launch need internet access.
+Reading your files after setup works offline.
+
+To open a particular file, pass its path. Quote paths containing spaces.
+
+#+begin_src sh
+npm run dev -- ~/notes/today.org
+# After the first build, skip rebuilding to launch again:
+npm start -- ~/notes/today.org
+#+end_src
+
+Open files with the toolbar, drag and drop, or =Cmd/Ctrl+O=. Save in your
+editor to refresh the preview. The app polls the open file every 300 ms and
+keeps watching after atomic saves or deletion and recreation. It opens one
+file at a time and supports UTF-8 files up to 4 MB.
+
+Use =Cmd/Ctrl+F= to search. Enter advances to the next match and Shift+Enter
+moves back. Search stays inside the current document view and shows up to
+1,000 matches. =Cmd/Ctrl+Shift+S= switches between preview and read-only source.
+Use =Cmd/Ctrl++= and =Cmd/Ctrl+-= to zoom. Click the file card to reveal the
+file in Finder or your file manager.
+
+* Build a desktop app
+Run these commands on the target operating system. Build output goes in
+=release/=. These commands create local artifacts and do not publish releases.
+
+#+begin_src sh
+npm run dist:mac    # .dmg and .zip for the Mac's architecture
+npm run dist:linux  # .AppImage and .tar.gz for the Linux machine's architecture
+npm run pack       # Unpacked application for a quick packaging check
+#+end_src
+
+macOS builds are unsigned prototypes. Signing and notarization are still
+needed before distributing a polished release. The app declares itself as
+an Org file viewer so installed builds can appear in Open With.
+
+** Linux and Omarchy
+Build on Linux, then run the AppImage as your normal desktop user.
+
+#+begin_src sh
+chmod +x release/*.AppImage
+./release/Org\ Preview-0.1.0.AppImage ~/notes/today.org
+#+end_src
+
+Use the actual filename generated in =release/=. You can also extract the
+=.tar.gz= and run its =org-preview= executable. The archive avoids a FUSE
+requirement. If AppImage reports a FUSE error on Arch, install =fuse2= or use
+[[https://docs.appimage.org/user-guide/troubleshooting/fuse.html][AppImage's extract-and-run option]].
+
+Electron uses the Linux desktop's display stack. For a Wayland session you
+can pass =--ozone-platform=wayland= to the executable. If a compositor has
+problems, test =--ozone-platform=x11= through XWayland. Do not run as root.
+Omarchy/Hyprland needs a manual smoke test on a real desktop. CI exercises
+Linux under Xvfb, which does not establish Wayland compatibility.
+
+* What v0.1 renders
+- Document title, subtitle, author, headings, and outline navigation.
+- TODO and DONE states, priorities, tags, planning lines, and folded drawers.
+- Bold, italic, underline, strike-through, code, and verbatim text.
+- Ordered and unordered lists, nested lists, and read-only checkboxes.
+- Tables, source/example blocks, quotes, and HTTP/HTTPS/mailto links.
+- Internal heading links and =CUSTOM_ID= links for common cases.
+
+The preview uses Orga's syntax tree and an explicit HTML renderer. It is not
+Emacs's exporter. Custom TODO workflows, footnotes, inline math, timestamps,
+macros, export options, and complex Org constructs may display literally or
+incompletely. Source view always shows the original file.
+
+Local images and links to other files are not opened in this prototype.
+Raw export blocks display as text. Babel, includes, embedded HTML, and
+custom URL handlers never execute. Documents cannot fetch network resources.
+Clicking a web link opens your browser. No telemetry or cloud services.
+
+* Development and checks
+#+begin_src sh
+npm run check       # Parser/file-watcher tests and production renderer build
+npm run test:smoke  # Actual Electron UI and external-save tests
+npm run notices     # Refresh bundled dependency license texts
+#+end_src
+
+On a headless Linux machine, run the desktop smoke test with
+=xvfb-run --auto-servernum npm run test:smoke=.
+
+GitHub Actions runs tests, desktop smoke checks, and packaging on macOS and
+Linux. Successful runs provide prototype installers as workflow artifacts.
+The smoke test checks rendering, source view, themes, document search, file
+opening, saves, atomic replacement, delete/recreate recovery, and sandboxed
+rendering. Screenshots are saved in =test-results/=.
+
+| Path                   | Purpose                            |
+|------------------------+------------------------------------|
+| =electron/main.cjs=    | Window, file opening, and safe IPC  |
+| =electron/documents.cjs= | Bounded reads and file watching  |
+| =electron/preload.cjs= | Narrow bridge to the renderer      |
+| =src/org.js=          | Org AST to escaped HTML            |
+| =src/app.js=          | Reading interface and navigation   |
+| =src/search.js=       | Search ranges inside the document  |
+| =examples/welcome.org= | A notebook to try on first launch |
+
+The first commit contains only this project's original goal and scope.
+Prototype implementation lives on =MVP-v0.1=.
 
 * License and acknowledgments
-The project uses the BSD 3-Clause license. The [[https://github.com/orgapp/orgajs][Orga]] parser is MIT-licensed.
+The project uses the [[file:LICENSE][BSD 3-Clause license]]. The [[https://github.com/orgapp/orgajs][Orga]] parser is MIT-licensed.
 [[https://github.com/pluk-inc/markdown-preview][Markdown Preview]] inspired the workflow. This is an independent implementation.
+
+See [[file:THIRD-PARTY-NOTICES.org][third-party notices]] for dependency licenses.

@@ -1,0 +1,80 @@
+{
+  "name": "org-preview",
+  "version": "0.1.0",
+  "description": "A live Org-mode file previewer for macOS and Linux",
+  "author": "Chad Stovern",
+  "license": "BSD-3-Clause",
+  "repository": "github:chadhs/org-preview",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "npm run build && node scripts/start.mjs",
+    "start": "node scripts/start.mjs",
+    "build": "vite build",
+    "test": "node --test test/*.test.js",
+    "test:smoke": "npm run build && node scripts/smoke.mjs",
+    "check": "npm test && npm run build",
+    "dist:mac": "npm run build && electron-builder --mac --publish never",
+    "dist:linux": "npm run build && electron-builder --linux --publish never",
+    "pack": "npm run build && electron-builder --dir",
+    "notices": "node scripts/notices.mjs"
+  },
+  "build": {
+    "appId": "com.chadhs.org-preview",
+    "productName": "Org Preview",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "examples/**/*",
+      "LICENSE",
+      "README.org",
+      "THIRD-PARTY-NOTICES.org"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "fileAssociations": [
+      {
+        "ext": "org",
+        "name": "Org document",
+        "role": "Viewer",
+        "mimeType": "text/org"
+      }
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity",
+      "identity": null
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "tar.gz"
+      ],
+      "category": "Office",
+      "executableName": "org-preview",
+      "desktop": {
+        "entry": {
+          "MimeType": "text/org;text/x-org;",
+          "StartupWMClass": "org-preview"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "dompurify": "^3.4.15",
+    "orga": "^4.7.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "electron": "^44.2.0",
+    "electron-builder": "^26.15.3",
+    "vite": "^8.2.2"
+  }
+}

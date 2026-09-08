@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+    <title>Org Preview</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="toolbar">
+        <div class="brand"><span class="brand-icon" aria-hidden="true">*</span><span>org<span class="brand-light">preview</span></span><span class="version">0.1</span></div>
+        <div class="toolbar-actions">
+          <button id="toggle-outline" class="icon-button" aria-label="Toggle outline" title="Toggle outline"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M8 4v12"/></svg></button>
+          <div class="segmented" aria-label="Document view"><button id="preview-tab" aria-pressed="true">Preview</button><button id="source-tab" aria-pressed="false">Source</button></div>
+          <button id="find-button" class="icon-button" aria-label="Find in document" title="Find in document"><svg viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg></button>
+          <select id="theme" aria-label="Appearance"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+          <button id="open" class="primary"><svg viewBox="0 0 20 20"><path d="M2 6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1Z"/></svg>Open file<span class="shortcut" id="open-shortcut">⌘O</span></button>
+        </div>
+      </header>
+      <div id="search-bar" hidden><label for="search">Find</label><input id="search" type="search" placeholder="Search this document" maxlength="1000"><span id="search-count" role="status"></span><button id="find-prev" aria-label="Previous match">↑</button><button id="find-next" aria-label="Next match">↓</button><button id="close-search" aria-label="Close search">×</button></div>
+      <div id="error" role="alert" hidden></div>
+      <div class="workspace">
+        <aside id="sidebar">
+          <div class="sidebar-label">DOCUMENT</div>
+          <button id="file-info" class="file-card" title="Reveal file in Finder or file manager"><span class="file-icon">org</span><span><strong id="filename">welcome.org</strong><small>Local file</small></span></button>
+          <div class="outline-label"><span class="sidebar-label">OUTLINE</span><span id="heading-count">0</span></div>
+          <nav id="outline" aria-label="Document outline"></nav>
+          <div class="sidebar-bottom"><span class="live-dot"></span><span>Watching for changes<small>Save in your editor. Read here.</small></span></div>
+        </aside>
+        <main id="reader" tabindex="0" aria-label="Document preview">
+          <div class="page-top"><span id="breadcrumb">welcome.org</span><span id="mode-label">ORG DOCUMENT</span></div>
+          <article id="document">
+            <header class="document-header"><div class="eyebrow">ORG PREVIEW</div><h1 id="document-title">Your words, in Org.</h1><p id="subtitle"></p><div id="metadata"></div></header>
+            <div id="content"></div>
+            <div class="document-end"><span>*</span><span>End of document</span></div>
+          </article>
+          <pre id="source" tabindex="0" hidden></pre>
+        </main>
+      </div>
+      <footer class="statusbar"><span id="status" role="status"><span class="live-dot"></span>Opening document…</span><span id="stats"></span><span class="status-right">UTF-8 <span class="status-divider">/</span> Org mode</span></footer>
+      <div id="drop-overlay" hidden><span class="brand-icon">*</span><h2>Drop your .org file</h2><p>Keep writing in your favorite editor.</p></div>
+    </div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>
