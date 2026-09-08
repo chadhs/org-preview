@@ -38,42 +38,15 @@ Builds include a platform-specific =SHA256SUMS-*.txt= file. Compare a
 package's SHA-256 with that file before installing. On macOS use
 =shasum -a 256 <filename>=; on Linux use =sha256sum <filename>=.
 
-** macOS
-Open the DMG and copy Org Preview into Applications, or unzip the ZIP and
-move its app into Applications. Keep one installed copy so Finder can pick
-the intended app. Launch it and use Open file, or choose Org Preview in
-Finder's Open With menu for an =.org= document.
+* Install and update
+The [[file:README.org][README installation guide]] covers both platforms step by step:
+- macOS Applications installation, unsigned-app approval, and Finder opening.
+- Omarchy's FUSE-free tar installation, CLI shortcut, and optional app launcher.
+- AppImage alternatives, checksum verification, updates, and first use.
 
-These builds are unsigned and unnotarized. macOS may block the first launch.
-The automated build does not exercise Gatekeeper approval for a downloaded,
-quarantined artifact. Signing and notarization are outside the current scope.
-
-** Linux, Arch, and Omarchy
-The Linux x86_64 builds work on Arch-based systems, including Omarchy.
-Native testing used Omarchy 4.0.2 / Hyprland 0.56.2 with Wayland and XWayland.
-There is no AUR or pacman package yet.
-
-Make the AppImage executable, then launch it as your normal desktop user.
-
-#+begin_src sh
-chmod +x 'Org Preview-VERSION.AppImage'
-./Org\ Preview-VERSION.AppImage ~/notes/today.org
-#+end_src
-
-If FUSE 2 is unavailable, use extract-and-run or the tar archive:
-
-#+begin_src sh
-./Org\ Preview-VERSION.AppImage --appimage-extract-and-run ~/notes/today.org
-
-tar -xzf org-preview-VERSION.tar.gz
-./org-preview-VERSION/org-preview ~/notes/today.org
-#+end_src
-
-The AppImage includes a desktop entry and icons for desktop integration
-tools. The tar archive is portable and does not install a launcher or alter
-file associations. Native Wayland and XWayland were tested on Omarchy. You
-can choose a display backend with =--ozone-platform=wayland= or
-=--ozone-platform=x11=. Sandboxing stays enabled in both modes.
+Downloaded releases need no Node.js, npm, or Emacs. Omarchy was the native
+Linux test platform, with both Wayland and XWayland verified. There is no
+AUR or pacman package yet.
 
 * Known limits
 - One document at a time, UTF-8, up to 4 MB.

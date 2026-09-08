@@ -107,6 +107,8 @@ test('release notes use the actual version and source, without stale publication
   const notes = releaseNotes({ version: '0.12.0', repository: 'chadhs/org-preview', source, changes: 'Merged feature A.' });
   assert.match(notes, /Org Preview-0\.12\.0-arm64\.dmg/);
   assert.match(notes, /org-preview-0\.12\.0\.tar\.gz/);
+  assert.match(notes, /ORG_PREVIEW_VERSION=0\.12\.0/);
+  assert.ok(notes.includes('/blob/v0.12.0/README.org#install'));
   assert.ok(notes.includes(source));
   assert.match(notes, /Merged feature A/);
   assert.doesNotMatch(notes, /MVP-v0\.1|after the PR is merged/);

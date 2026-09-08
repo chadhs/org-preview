@@ -3,6 +3,183 @@
 
 [[file:build/icons/128x128.png]]
 
+* Install
+You do not need Node.js, npm, or Emacs to use a downloaded release.
+Supported downloads are macOS Apple Silicon and Linux x86_64, including
+Arch-based systems such as Omarchy.
+
+After merging, wait for the [[https://github.com/chadhs/org-preview/actions/workflows/release.yml][Release a minor version workflow]] to finish.
+Then open [[https://github.com/chadhs/org-preview/releases/latest][the latest release]] and expand *Assets*. The first release is =v0.1.0=.
+If no release appears, check that workflow before trying to download.
+Choose the application package below, not GitHub's *Source code* archives.
+
+| Your system              | Download                           |
+|--------------------------+------------------------------------|
+| macOS, Apple Silicon     | Org Preview-VERSION-arm64.dmg       |
+| Omarchy / Arch, x86_64    | org-preview-VERSION.tar.gz          |
+| Linux portable alternative | Org Preview-VERSION.AppImage     |
+
+=VERSION= means the number on the release page, without the =v= prefix.
+Download the matching =SHA256SUMS-darwin-arm64.txt= or
+=SHA256SUMS-linux-x64.txt= too. Optional verification commands are below.
+
+** macOS: install in Applications
+1. Download the =arm64.dmg= file. In About This Mac, the Chip field should
+   name an Apple chip such as M1, M2, M3, or later. Intel Macs have no binary
+   in this release.
+2. Quit any running Org Preview copies, including development builds.
+3. Open the DMG and drag *Org Preview.app* into *Applications*. Replace an
+   older copy if you are updating. Eject the disk image afterward.
+4. Open *Applications → Org Preview*. Launch the installed copy rather than
+   a copy inside Downloads or the mounted disk image.
+5. Click *Open file* or press =⌘O= and choose an =.org= file. You can also drag
+   a file into the app, or use Finder's *Open With → Org Preview*.
+
+The app is currently unsigned and unnotarized. If macOS says the developer
+cannot be verified or Apple cannot check it, and you trust the download
+from this repository:
+
+1. Try opening the installed app once and dismiss the alert.
+2. Open *System Settings → Privacy & Security*.
+3. Find the message about Org Preview and choose *Open Anyway*, then confirm
+   *Open*. Authenticate if macOS asks. This approves this app specifically.
+
+See [[https://support.apple.com/en-us/102445][Apple's first-launch instructions]]. If macOS reports a damaged app,
+re-download it and compare its checksum. Report the exact alert if that
+persists or the approval option is unavailable.
+
+Keep one installed copy to avoid ambiguous Finder entries. To make previews
+the default for =.org= files, optionally choose an Org file in Finder, press
+=⌘I=, select Org Preview under *Open with*, and click *Change All*.
+
+You can open files from Terminal after installation:
+
+#+begin_src sh
+open -a 'Org Preview' "$HOME/notes/today.org"
+#+end_src
+
+The ZIP is an alternative to the DMG: unzip it and move its app to
+Applications, then follow the same first-launch steps.
+
+** Omarchy / Arch: install the tar package
+The application was tested on Omarchy 4.0.2 with Hyprland 0.56.2, using
+native Wayland and XWayland. This installation needs no FUSE and no =sudo=.
+There is no AUR or pacman package yet.
+
+Download =org-preview-VERSION.tar.gz= to your Downloads folder. Run the
+following in a terminal. Change =ORG_PREVIEW_VERSION= to match your download;
+=0.1.0= is correct for the first release.
+
+#+begin_src sh
+ORG_PREVIEW_VERSION=0.1.0
+cd "$HOME/Downloads"
+mkdir -p "$HOME/.local/opt" "$HOME/.local/bin"
+tar -xzf "org-preview-$ORG_PREVIEW_VERSION.tar.gz" -C "$HOME/.local/opt"
+ln -sfn "$HOME/.local/opt/org-preview-$ORG_PREVIEW_VERSION/org-preview" "$HOME/.local/bin/org-preview"
+"$HOME/.local/bin/org-preview"
+#+end_src
+
+The app opens its welcome document. Click *Open file*, press =Ctrl+O=, or
+drag an =.org= file into the window. To open a file from a terminal:
+
+#+begin_src sh
+"$HOME/.local/bin/org-preview" "$HOME/notes/today.org"
+#+end_src
+
+If =~/.local/bin= is already in your PATH, =org-preview= works as a shorter
+command. The full path above works without changing shell configuration.
+
+*** Add Org Preview to the app launcher
+This optional step creates a user-local desktop entry with the app's icon.
+Set the version to the one you installed, then paste the whole block:
+
+#+begin_src sh
+ORG_PREVIEW_VERSION=0.1.0
+mkdir -p "$HOME/.local/share/applications"
+cat > "$HOME/.local/share/applications/org-preview.desktop" <<EOF_DESKTOP
+[Desktop Entry]
+Type=Application
+Name=Org Preview
+GenericName=Org document viewer
+Comment=Read Org files and follow changes as you save
+Exec="$HOME/.local/bin/org-preview" %f
+Icon=$HOME/.local/opt/org-preview-$ORG_PREVIEW_VERSION/resources/icon.png
+Terminal=false
+Categories=Office;
+MimeType=text/org;text/x-org;
+StartupWMClass=org-preview
+Keywords=org-mode;Emacs;notes;
+EOF_DESKTOP
+if command -v update-desktop-database >/dev/null 2>&1; then
+  update-desktop-database "$HOME/.local/share/applications"
+fi
+#+end_src
+
+Open Omarchy's app launcher and search for *Org Preview*. The file manager
+can also offer it under *Open With*. Optionally make it the default Org
+viewer after creating the desktop entry:
+
+#+begin_src sh
+xdg-mime default org-preview.desktop text/org
+xdg-mime default org-preview.desktop text/x-org
+#+end_src
+
+*** AppImage alternative
+Download the AppImage to Downloads and use this block, changing the version
+if necessary. The extract-and-run option works without FUSE 2 and was tested
+on Omarchy:
+
+#+begin_src sh
+ORG_PREVIEW_VERSION=0.1.0
+cd "$HOME/Downloads"
+chmod +x "Org Preview-$ORG_PREVIEW_VERSION.AppImage"
+"./Org Preview-$ORG_PREVIEW_VERSION.AppImage" --appimage-extract-and-run
+#+end_src
+
+If [[https://archlinux.org/packages/extra/x86_64/fuse2/][fuse2]] is installed, you can omit =--appimage-extract-and-run=.
+The test machine lacked FUSE 2, so direct mounted execution was not verified.
+See [[https://docs.appimage.org/user-guide/troubleshooting/fuse.html][AppImage's FUSE guidance]] if needed. Neither AppImage launch mode
+installs a launcher by itself; use the tar instructions above for a persistent
+user-local installation with a desktop entry.
+
+*** Wayland and XWayland
+Both backends were tested. If you need to select one explicitly:
+
+#+begin_src sh
+"$HOME/.local/bin/org-preview" --ozone-platform=wayland "$HOME/notes/today.org"
+# Alternatively, through XWayland:
+"$HOME/.local/bin/org-preview" --ozone-platform=x11 "$HOME/notes/today.org"
+#+end_src
+
+Run the app as your normal desktop user. Sandboxing stays enabled.
+
+** Verify a download
+Run the appropriate command in Downloads and compare its hash with the
+same filename in the downloaded =SHA256SUMS-*.txt= file. These examples use
+the first release; change the version for a later download.
+
+#+begin_src sh
+# macOS:
+cd "$HOME/Downloads"
+shasum -a 256 'Org Preview-0.1.0-arm64.dmg'
+
+# Omarchy / Linux:
+cd "$HOME/Downloads"
+sha256sum org-preview-0.1.0.tar.gz
+#+end_src
+
+** Start using it
+Open a notebook in Org Preview and the same file in your editor. Save a
+change in the editor; the preview updates automatically. Search with
+=⌘F= / =Ctrl+F= and switch to read-only source with =⌘⇧S= / =Ctrl+Shift+S=.
+Your files stay local. Opening a preview does not modify the document.
+
+** Update to a later version
+There is no in-app updater yet. Download the new release and quit the old
+app first. On macOS, replace the Applications copy. On Omarchy, rerun the
+tar installation and desktop-entry blocks with the new version; they update
+the command link and icon path. Your Org files are independent of the app.
+
 * Why
 Org files are comfortable to write and read as plain text. They deserve a
 standalone reader that renders them well, too.
@@ -36,7 +213,7 @@ working file-to-preview loop over complete Org export compatibility.
 - Full Org export parity, LaTeX rendering, and diagram engines.
 - Finder Quick Look, signed installers, automatic updates, and an AUR package.
 
-* Run the prototype
+* Run from source
 Use Node.js 24 LTS and npm. No Emacs installation is needed.
 
 #+begin_src sh
@@ -83,40 +260,6 @@ npm run checksums  # SHA-256 sums for the packages in release/
 macOS builds are unsigned prototypes. Signing and notarization are still
 needed before distributing a polished release. The app declares itself as
 an Org file viewer so installed builds can appear in Open With.
-
-** Linux, Arch, and Omarchy
-Download the Linux x86_64 AppImage or tar archive from [[https://github.com/chadhs/org-preview/releases][GitHub Releases]],
-or build on Linux. The application was tested on Omarchy 4.0.2 with
-Hyprland 0.56.2, using both native Wayland and XWayland. AppImage
-extract-and-run and the extracted tar application both passed.
-
-There is no AUR or pacman package yet. Run the AppImage as your normal
-desktop user; the tar archive is an alternative that does not need FUSE.
-
-#+begin_src sh
-chmod +x release/*.AppImage
-./release/Org\ Preview-VERSION.AppImage ~/notes/today.org
-#+end_src
-
-Use the actual filename generated in =release/=. You can also extract the
-=.tar.gz= and run its =org-preview= executable. The archive avoids a FUSE
-requirement. If AppImage reports a FUSE error on Arch, install [[https://archlinux.org/packages/extra/x86_64/fuse2/][fuse2]] or use
-[[https://docs.appimage.org/user-guide/troubleshooting/fuse.html][AppImage's extract-and-run option]]:
-
-#+begin_src sh
-./release/Org\ Preview-VERSION.AppImage --appimage-extract-and-run --ozone-platform=wayland ~/notes/today.org
-#+end_src
-
-Electron uses the Linux desktop's display stack. For a Wayland session you
-can pass =--ozone-platform=wayland= to the executable. If a compositor has
-problems, test =--ozone-platform=x11= through XWayland. Do not run as root.
-CI exercises Linux under Xvfb and validates the extracted AppImage launcher.
-The AppImage contains desktop metadata and icons; desktop integration tools
-can use them to add a launcher. The portable tar archive does not install
-a launcher or change file associations.
-The Omarchy test machine lacked FUSE 2, so direct FUSE-mounted AppImage
-launch was not verified there. The two alternatives above keep sandboxing
-enabled.
 
 * Automatic releases
 Every push to =main=, including merge, squash, and rebase merges, starts a

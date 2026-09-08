@@ -85,14 +85,48 @@ export function assertMainRelease(env) {
 }
 export function releaseNotes({ version, repository, source, changes = '' }) {
   parseVersion(version);
-  return `Org Preview is a live reader for local Org-mode files on macOS and Linux. Keep writing in your editor and the preview follows your saves.\n\n` +
-    `Includes an outline, search, source view, themes, zoom, and common Org formatting. Documents stay local; embedded HTML and Babel blocks never execute. BSD-3-Clause, with the MIT-licensed Orga parser.\n\n` +
-    `### Install\n\n` +
-    `- **Apple Silicon Mac:** download \`Org Preview-${version}-arm64.dmg\` or \`Org Preview-${version}-arm64-mac.zip\`, then move the app to Applications. Keep one installed copy to avoid Finder ambiguity. Builds are unsigned and unnotarized; macOS may require approval before first launch.\n` +
-    `- **Linux x86_64, including Arch/Omarchy:** make \`Org Preview-${version}.AppImage\` executable and run it. If FUSE 2 is unavailable, add \`--appimage-extract-and-run\`, or extract \`org-preview-${version}.tar.gz\` and run its \`org-preview\` executable. The tar archive does not install a desktop launcher.\n` +
-    `- Compare each download's SHA-256 with the attached platform checksum file.\n\n` +
-    `### Known limits\n\nOne UTF-8 document at a time, up to 4 MB. Editing, full Emacs export parity, local image/file links, math/diagrams, Babel, Quick Look, signing, and auto-updates remain outside scope. Intel Mac builds are not supplied.\n\n` +
-    `[Release information](https://github.com/${repository}/blob/v${version}/RELEASE-NOTES.org) · [Merged source](https://github.com/${repository}/commit/${source})\n\n` + changes;
+  const guide = `https://github.com/${repository}/blob/v${version}/README.org#install`;
+  return [
+    'Org Preview is a live reader for local Org-mode files. Keep writing in your editor and the preview follows your saves. Downloaded releases need no Node.js, npm, or Emacs.',
+    '',
+    'Includes an outline, search, source view, themes, zoom, and common Org formatting. Documents stay local; embedded HTML and Babel blocks never execute. BSD-3-Clause, with the MIT-licensed Orga parser.',
+    '',
+    '### macOS: Apple Silicon',
+    '',
+    `1. Download \`Org Preview-${version}-arm64.dmg\` and \`SHA256SUMS-darwin-arm64.txt\` from Assets below. The ZIP is an alternative; GitHub's Source code archives are not installers.`,
+    '2. Quit older copies. Open the DMG, drag Org Preview.app into Applications, and eject the disk image.',
+    '3. Launch the Applications copy. If macOS cannot verify the developer and you trust this repository, first try opening the app, then use System Settings → Privacy & Security → Open Anyway and confirm Open. These builds are unsigned and unnotarized.',
+    '4. Click Open file, press ⌘O, drag in an Org file, or use Finder → Open With → Org Preview. Keep one installed copy.',
+    '',
+    '[Apple first-launch guidance](https://support.apple.com/en-us/102445). If the app is reported as damaged, re-download and verify its checksum; report the exact alert if it persists.',
+    '',
+    '### Omarchy / Arch Linux: x86_64',
+    '',
+    `Download \`org-preview-${version}.tar.gz\` and \`SHA256SUMS-linux-x64.txt\` to Downloads. This tested installation uses your home directory and needs no FUSE or sudo:`,
+    '',
+    '```sh',
+    `ORG_PREVIEW_VERSION=${version}`,
+    'cd "$HOME/Downloads"',
+    'mkdir -p "$HOME/.local/opt" "$HOME/.local/bin"',
+    'tar -xzf "org-preview-$ORG_PREVIEW_VERSION.tar.gz" -C "$HOME/.local/opt"',
+    'ln -sfn "$HOME/.local/opt/org-preview-$ORG_PREVIEW_VERSION/org-preview" "$HOME/.local/bin/org-preview"',
+    '"$HOME/.local/bin/org-preview"',
+    '```',
+    '',
+    `Use Open file, Ctrl+O, or drag-and-drop. Open notebooks from the terminal with \`~/.local/bin/org-preview ~/notes/today.org\`. The [installation guide](${guide}) includes an optional app-launcher entry, default file associations, and update instructions. No AUR/pacman package is supplied.`,
+    '',
+    `Alternatively download \`Org Preview-${version}.AppImage\`, make it executable, and run it with \`--appimage-extract-and-run\` when FUSE 2 is absent. Native Wayland and XWayland were tested on Omarchy. Run as your normal user with sandboxing enabled.`,
+    '',
+    'Compare downloads with the supplied SHA-256 files using `shasum -a 256` on macOS or `sha256sum` on Linux. To update, quit the app and repeat installation for the new version; there is no in-app updater.',
+    '',
+    '### Known limits',
+    '',
+    'One UTF-8 document at a time, up to 4 MB. Editing, full Emacs export parity, local image/file links, math/diagrams, Babel, Quick Look, signing, and auto-updates remain outside scope. Intel Mac builds are not supplied.',
+    '',
+    `[Release information](https://github.com/${repository}/blob/v${version}/RELEASE-NOTES.org) · [Merged source](https://github.com/${repository}/commit/${source})`,
+    '',
+    changes,
+  ].join('\n');
 }
 // A failed upload leaves a draft. Published releases and their assets are never replaced.
 export async function uploadAndPublish(github, plan, assets, body) {
