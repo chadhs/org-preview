@@ -1,0 +1,43 @@
+#+title: org-preview
+#+subtitle: A live preview for people who write in Org mode
+
+* Why
+Org files are comfortable to write and read as plain text. They deserve a
+standalone reader that renders them well, too.
+
+org-preview will be a free, open-source desktop app for opening =.org= files
+and watching the preview update as you save changes in your favorite editor.
+It takes inspiration from [[https://markdownpreview.app][Markdown Preview]], with Org syntax and equal attention
+to macOS and Linux, including Omarchy.
+
+* Goal
+Open a file, read it, and keep writing in the editor you already use. No
+account, cloud service, or Emacs installation should be required.
+
+* Scope for v0.1
+- Open local =.org= files through a file picker, drag and drop, or the command line.
+- Refresh the document after external saves, including atomic file replacement.
+- Render headings, emphasis, links, lists, checkboxes, tables, and source blocks.
+- Show an outline, TODO states, tags, and document metadata.
+- Provide search, a read-only source view, and light and dark themes.
+- Keep document content local and never execute Babel blocks or embedded HTML.
+- Provide a repeatable build for macOS and Linux.
+
+* Approach
+Use Electron for the desktop shell and Orga for parsing Org syntax. A
+sandboxed renderer displays sanitized HTML. The first prototype favors a
+working file-to-preview loop over complete Org export compatibility.
+
+* Outside the first release
+- An editor, agenda, task manager, or replacement for Emacs.
+- Babel execution, remote includes, or cloud synchronization.
+- Full Org export parity, LaTeX rendering, and diagram engines.
+- Finder Quick Look, signed installers, automatic updates, and an AUR package.
+
+* Development
+The initial commit records the goal and scope. Prototyping happens on
+=MVP-v0.1=, with setup and validation instructions added as the app takes shape.
+
+* License and acknowledgments
+The project uses the BSD 3-Clause license. The [[https://github.com/orgapp/orgajs][Orga]] parser is MIT-licensed.
+[[https://github.com/pluk-inc/markdown-preview][Markdown Preview]] inspired the workflow. This is an independent implementation.
