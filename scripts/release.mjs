@@ -9,9 +9,13 @@ const command = process.argv[2];
 if (command === 'stamp') {
   await stampVersion(process.cwd(), process.argv[3]);
 } else {
+  assertMainRelease(process.env);
   const source = process.env.RELEASE_SOURCE || process.env.GITHUB_SHA;
   if (!/^[a-f0-9]{40}$/.test(source || '')) throw new Error('Missing full source commit SHA.');
   if (git('rev-parse', 'HEAD') !== source) throw new Error('Checkout must match the triggering source commit.');
+  // A merged-event fallback may arrive after main has advanced. Only release
+  // the exact merged snapshot, and require it to be part of main's history.
+  git('merge-base', '--is-ancestor', source, 'origin/main');
   const repository = process.env.GITHUB_REPOSITORY;
   if (!/^[\w.-]+\/[\w.-]+$/.test(repository || '')) throw new Error('Invalid GitHub repository.');
   const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2026-03-10' };

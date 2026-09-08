@@ -81,7 +81,9 @@ export async function verifyAssets(directory, version) {
   }));
 }
 export function assertMainRelease(env) {
-  if (env.GITHUB_ACTIONS !== 'true' || env.GITHUB_EVENT_NAME !== 'push' || env.GITHUB_REF !== 'refs/heads/main') throw new Error('Publishing is allowed only for a main push in GitHub Actions.');
+  const regular = ['push', 'workflow_dispatch'].includes(env.GITHUB_EVENT_NAME);
+  const merged = env.GITHUB_EVENT_NAME === 'pull_request_target' && env.RELEASE_PR_MERGED === 'true' && env.RELEASE_PR_BASE === 'main';
+  if (env.GITHUB_ACTIONS !== 'true' || env.GITHUB_REF !== 'refs/heads/main' || (!regular && !merged)) throw new Error('Releasing is allowed only for trusted main events in GitHub Actions.');
 }
 export function releaseNotes({ version, repository, source, changes = '' }) {
   parseVersion(version);
