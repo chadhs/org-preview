@@ -72,7 +72,7 @@ including =notes café 日本語.org= and =second file Ω.org=.
 | Actual HTTP link               | Opens Example Domain in Safari       |
 | Actual mailto link             | Opens reader@example.invalid with subject "Org Preview test" in Mail |
 | Last-window close              | Native close control leaves no renderer pages |
-| Packaged keyboard shortcuts    | User verification pending            |
+| Packaged keyboard shortcuts    | User confirmed Command-F, Command-Shift-S, Command-plus/minus, and Command-W work |
 
 Finder lists Org Preview as an available Org viewer, while Emacs remains
 the default. The tests did not change the default file handler. Multiple
@@ -88,7 +88,9 @@ drags, so its failed drag attempts are excluded as application failures.
 The user independently dragged the named fixture into the packaged app and
 confirmed success. Native keyboard automation was reliable in the development
 picker workflow but inconsistent when targeting multiple packaged copies.
-The table separates verified shortcuts from pending manual checks.
+The user independently checked the packaged shortcuts and confirmed that
+all work. These user confirmations complete the native drag and keyboard
+checks that automation could not reliably perform.
 
 * Confirmed defect fixed
 macOS keeps the process alive after its last window closes. The prior
@@ -117,8 +119,8 @@ suite against the extracted macOS ZIP in addition to the development app.
 - The default Electron icon is still present. Branding, signing, and release
   distribution were not added during this test pass.
 - Intel macOS hardware was not available. These results cover Apple Silicon.
-- Generic Finder routing with multiple registered app copies and the remaining
-  packaged keyboard shortcuts need the follow-up described above.
+- Generic Finder routing with multiple registered app copies needs the
+  single-installation follow-up described above.
 - Existing v0.1 exclusions remain, including editing, Babel execution, remote
   includes, full Org export parity, math/diagrams, local image/file links,
   Quick Look, synchronization, signing, and automatic updates.
