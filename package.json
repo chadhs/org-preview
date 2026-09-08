@@ -68,8 +68,7 @@
           "Name": "Org Preview",
           "GenericName": "Org document viewer",
           "Keywords": "org-mode;Emacs;notes;outline;plain text;",
-          "Terminal": "false",
-          "SingleMainWindow": "true"
+          "Terminal": "false"
         }
       },
       "icon": "build/icons",
