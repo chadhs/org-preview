@@ -116,8 +116,9 @@ suite against the extracted macOS ZIP in addition to the development app.
   downloaded quarantined distribution was not tested or bypassed.
 - The DMG passes integrity verification; the ZIP-extracted application was
   the artifact used for full runtime testing.
-- The default Electron icon is still present. Branding, signing, and release
-  distribution were not added during this test pass.
+- The original test build used the default Electron icon. Release preparation
+  subsequently replaced it with the project icon; signing and publication
+  remain outside this test pass.
 - Intel macOS hardware was not available. These results cover Apple Silicon.
 - Generic Finder routing with multiple registered app copies needs the
   single-installation follow-up described above.

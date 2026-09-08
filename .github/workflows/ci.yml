@@ -33,12 +33,24 @@ jobs:
       - name: Package Linux prototype
         if: runner.os == 'Linux'
         run: npm run dist:linux
+      - name: Validate the Linux AppImage launcher
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y desktop-file-utils
+          mkdir -p "$RUNNER_TEMP/org-preview-appimage"
+          cd "$RUNNER_TEMP/org-preview-appimage"
+          "$GITHUB_WORKSPACE"/release/*.AppImage --appimage-extract > /dev/null
+          desktop-file-validate squashfs-root/org-preview.desktop
+          node "$GITHUB_WORKSPACE/scripts/check-linux-desktop.mjs" squashfs-root
       - name: Smoke test the macOS ZIP artifact
         if: runner.os == 'macOS'
         run: |
           mkdir -p "$RUNNER_TEMP/org-preview-packaged"
           ditto -xk release/*.zip "$RUNNER_TEMP/org-preview-packaged"
           ORG_PREVIEW_EXECUTABLE="$RUNNER_TEMP/org-preview-packaged/Org Preview.app/Contents/MacOS/Org Preview" node scripts/smoke.mjs
+      - name: Generate package checksums
+        run: npm run checksums
       - uses: actions/upload-artifact@v7.0.1
         with:
           name: org-preview-${{ runner.os }}-${{ runner.arch }}
@@ -47,6 +59,7 @@ jobs:
             release/*.zip
             release/*.AppImage
             release/*.tar.gz
+            release/SHA256SUMS-*.txt
           if-no-files-found: error
       - uses: actions/upload-artifact@v7.0.1
         if: always()

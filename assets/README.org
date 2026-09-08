@@ -1,0 +1,13 @@
+#+title: Org Preview icon
+
+The icon combines an Org heading star with document lines, using the
+terracotta and cream colors of the reading interface.
+
+=icon.svg= is the source. Run =npm run icons= with Node 24 to regenerate
+=build/icon.icns= and the Linux PNG sizes in =build/icons/=. The generated
+files are committed so ordinary application builds need no graphics tools.
+
+The artwork and conversion script use the project's BSD-3-Clause license.
+The converter uses =@resvg/resvg-js= under MPL-2.0 as a development dependency.
+That tool is not included in the distributed application. The icon uses no
+fonts, stock images, or third-party artwork.

@@ -9,7 +9,7 @@
   <body>
     <div id="app">
       <header class="toolbar">
-        <div class="brand"><span class="brand-icon" aria-hidden="true">*</span><span>org<span class="brand-light">preview</span></span><span class="version">0.1</span></div>
+        <div class="brand"><img class="brand-icon" src="/assets/icon.svg" alt=""><span>org<span class="brand-light">preview</span></span><span class="version">0.1</span></div>
         <div class="toolbar-actions">
           <button id="toggle-outline" class="icon-button" aria-label="Toggle outline" title="Toggle outline"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M8 4v12"/></svg></button>
           <div class="segmented" aria-label="Document view"><button id="preview-tab" aria-pressed="true">Preview</button><button id="source-tab" aria-pressed="false">Source</button></div>
@@ -39,7 +39,7 @@
         </main>
       </div>
       <footer class="statusbar"><span id="status" role="status"><span class="live-dot"></span>Opening document…</span><span id="stats"></span><span class="status-right">UTF-8 <span class="status-divider">/</span> Org mode</span></footer>
-      <div id="drop-overlay" hidden><span class="brand-icon">*</span><h2>Drop your .org file</h2><p>Keep writing in your favorite editor.</p></div>
+      <div id="drop-overlay" hidden><img class="brand-icon" src="/assets/icon.svg" alt=""><h2>Drop your .org file</h2><p>Keep writing in your favorite editor.</p></div>
     </div>
     <script type="module" src="/src/app.js"></script>
   </body>

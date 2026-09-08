@@ -3,6 +3,7 @@ import { mkdtemp, writeFile, rename, rm, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 const directory = await mkdtemp(path.join(tmpdir(), 'org-preview-smoke-'));
 const file = path.join(directory, 'smoke café 日本語.org');
@@ -99,6 +100,14 @@ try {
     child.once('exit', (code) => code === 0 ? resolve() : reject(new Error(`Second instance exited ${code}`)));
   });
   await expect(window.locator('#error')).toContainText('Choose an .org file.');
+  // Desktop launchers can pass file:// URLs, including encoded spaces/Unicode.
+  const uriChild = spawn(app.process().spawnfile, [...appArgs, pathToFileURL(path.join(directory, 'links.org')).href, profileArg], { env, stdio: 'ignore' });
+  await new Promise((resolve, reject) => {
+    uriChild.once('error', reject);
+    uriChild.once('exit', (code) => code === 0 ? resolve() : reject(new Error(`File URL instance exited ${code}`)));
+  });
+  await expect(window.locator('#document-title')).toHaveText('Links');
+  await expect(window.locator('#error')).toBeHidden();
   // Exercise the same picker path used by the Open button without a native dialog.
   await app.evaluate(({ dialog }, welcome) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [welcome] }); }, path.resolve('examples/welcome.org'));
   await window.locator('#open').click();

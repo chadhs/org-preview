@@ -1,0 +1,92 @@
+#+title: Org Preview v0.1.0
+
+* Publication status
+Prepared for the first release. Publish after the PR is merged and the
+maintainer completes installation testing. No release has been published.
+
+* A live reader for Org files
+Org Preview opens local =.org= files and refreshes the document when you
+save in your editor. It runs on macOS and Linux without requiring Emacs,
+an account, or a cloud service.
+
+This first release includes:
+- Native file picking, drag and drop, and command-line opening.
+- Live updates after normal saves, atomic saves, and deletion/recreation.
+- An outline, document search, read-only source view, zoom, and themes.
+- Headings, emphasis, tasks, tags, lists, checkboxes, tables, and code blocks.
+- HTTP/HTTPS/mailto links and common internal heading links.
+- An Org heading icon and Linux desktop entries with window matching,
+  searchable keywords, Org MIME types, and local file-URL handling.
+
+Document code and embedded HTML never execute. The renderer is sandboxed,
+and documents cannot load remote resources. Web links open in your browser;
+mail links open your mail client. No telemetry is included.
+
+* Downloads
+| Platform                 | Package                          |
+|--------------------------+----------------------------------|
+| macOS, Apple Silicon     | Org Preview-0.1.0-arm64.dmg       |
+| macOS, Apple Silicon     | Org Preview-0.1.0-arm64-mac.zip   |
+| Linux, x86_64            | Org Preview-0.1.0.AppImage        |
+| Linux, x86_64            | org-preview-0.1.0.tar.gz          |
+
+Builds include a platform-specific =SHA256SUMS-*.txt= file. Compare a
+package's SHA-256 with that file before installing. On macOS use
+=shasum -a 256 <filename>=; on Linux use =sha256sum <filename>=.
+
+** macOS
+Open the DMG and copy Org Preview into Applications, or unzip the ZIP and
+move its app into Applications. Keep one installed copy so Finder can pick
+the intended app. Launch it and use Open file, or choose Org Preview in
+Finder's Open With menu for an =.org= document.
+
+These builds are unsigned and unnotarized. macOS may block the first launch.
+Installation from a downloaded, quarantined artifact remains part of the
+maintainer's acceptance test before publication. Signing and notarization
+are outside this release's scope.
+
+** Linux and Omarchy
+Make the AppImage executable, then launch it as your normal desktop user.
+
+#+begin_src sh
+chmod +x 'Org Preview-0.1.0.AppImage'
+./Org\ Preview-0.1.0.AppImage ~/notes/today.org
+#+end_src
+
+If FUSE 2 is unavailable, use extract-and-run or the tar archive:
+
+#+begin_src sh
+./Org\ Preview-0.1.0.AppImage --appimage-extract-and-run ~/notes/today.org
+
+tar -xzf org-preview-0.1.0.tar.gz
+./org-preview-0.1.0/org-preview ~/notes/today.org
+#+end_src
+
+The AppImage includes a desktop entry and icons for desktop integration
+tools. The tar archive is portable and does not install a launcher or alter
+file associations. Native Wayland and XWayland were tested on Omarchy. You
+can choose a display backend with =--ozone-platform=wayland= or
+=--ozone-platform=x11=. Sandboxing stays enabled in both modes.
+
+* Known limits
+- One document at a time, UTF-8, up to 4 MB.
+- This is a reader. Keep editing in your existing editor.
+- Org rendering covers the documented subset, not full Emacs export parity.
+- Local images and links to other files, math, diagrams, Babel, remote
+  includes, agenda features, Quick Look, and automatic updates are excluded.
+- Direct FUSE-mounted AppImage launch was not tested on the Omarchy machine,
+  which lacks FUSE 2. Extract-and-run and tar execution passed.
+- Intel macOS and other architectures have no verified binaries in this release.
+- Multiple registered Mac app copies can confuse Finder's generic Open With
+  entry. Selecting the exact app works; single-copy installation still needs
+  the maintainer's final check.
+
+* Validation and license
+The implementation has passed automated checks on macOS and Linux, real
+Omarchy Wayland/XWayland testing, and Mac native checks. The user verified
+Finder dragging and Mac keyboard shortcuts. CI tests the Mac ZIP application
+and validates the extracted AppImage's desktop entry, icon, and sandbox flags.
+See [[file:MACOS-TESTING.org][macOS results]] and [[file:LINUX-TESTING.org][Linux results]] for the detailed test history.
+
+Org Preview and its artwork use BSD-3-Clause. The Org parser, Orga, uses MIT.
+Bundled dependencies retain their licenses in =THIRD-PARTY-NOTICES.org=.

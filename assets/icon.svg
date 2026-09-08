@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Org Preview</title>
+  <desc>An Org heading star and document lines on a terracotta tile.</desc>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#b86b49"/>
+      <stop offset="1" stop-color="#914329"/>
+    </linearGradient>
+  </defs>
+  <rect x="80" y="80" width="864" height="864" rx="196" fill="url(#tile)"/>
+  <rect x="84" y="84" width="856" height="856" rx="192" fill="none" stroke="#ffffff" stroke-opacity=".14" stroke-width="8"/>
+  <g fill="none" stroke="#fff6e8" stroke-linecap="round">
+    <path d="M350 250v210 M259 302l182 106 M259 408l182-106" stroke-width="58"/>
+    <path d="M548 355h188 M292 566h444 M292 710h324" stroke-width="44"/>
+  </g>
+</svg>

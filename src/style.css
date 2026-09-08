@@ -13,7 +13,7 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .toolbar { height: 72px; flex-shrink: 0; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); background: var(--chrome); gap: 20px; }
 .brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 650; letter-spacing: -.6px; }
 .brand-light { font-weight: 400; color: var(--muted); }
-.brand-icon { display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; background: var(--accent); color: #fff; border-radius: 8px; font-family: Georgia, serif; font-size: 38px; padding-top: 11px; }
+.brand-icon { display: block; width: 34px; height: 34px; flex-shrink: 0; }
 .version { margin-left: 1px; font-size: 10px; font-family: monospace; font-weight: 400; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; letter-spacing: 0; }
 .toolbar-actions { display: flex; align-items: center; gap: 12px; }
 .icon-button { display: flex; padding: 8px; }

@@ -6,6 +6,7 @@ const { documentArgument } = require('./arguments.cjs');
 let win, current, stopWatching;
 let openRevision = 0;
 let pendingPath = documentArgument(process.argv, app.isPackaged);
+const iconPath = app.isPackaged ? path.join(process.resourcesPath, 'icon.png') : path.join(__dirname, '../build/icons/256x256.png');
 const pageUrl = pathToFileURL(path.join(__dirname, '../dist/index.html')).href;
 const fail = (error) => win?.webContents.send('document:error', error.code === 'ENOENT' ? 'File unavailable. Waiting for it to return, or open another file.' : error.message);
 
@@ -47,7 +48,7 @@ function handle(channel, callback) {
   });
 }
 function createWindow() {
-  win = new BrowserWindow({ width: 1240, height: 850, minWidth: 720, minHeight: 500, backgroundColor: '#f8f7f3', title: 'Org Preview', webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true } });
+  win = new BrowserWindow({ width: 1240, height: 850, minWidth: 720, minHeight: 500, backgroundColor: '#f8f7f3', title: 'Org Preview', icon: iconPath, webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true } });
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   win.webContents.on('will-navigate', (event) => event.preventDefault());
   win.on('closed', () => { openRevision++; stopWatching?.(); win = undefined; current = undefined; });
@@ -64,6 +65,7 @@ else {
     win?.restore(); win?.focus();
   });
   app.whenReady().then(() => {
+    if (process.platform === 'darwin' && !app.isPackaged) app.dock.setIcon(iconPath);
     session.defaultSession.setPermissionRequestHandler((_wc, _permission, callback) => callback(false));
     session.defaultSession.setPermissionCheckHandler(() => false);
     // Documents cannot make network requests, even through image or CSS URLs.

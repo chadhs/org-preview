@@ -162,8 +162,11 @@ packages.
   unverified here; extract-and-run and tar execution pass.
 - Wayland logs a Chromium Vulkan compatibility message. Rendering and
   interaction still pass without graphics or sandbox overrides.
-- electron-builder warns about the default Electron icon and absent
-  =desktopName=. Installed desktop-file association was not verified.
+- The original build warned about the default Electron icon and absent
+  =desktopName=. Release preparation subsequently added the project icon,
+  matching desktop/window identifiers, and explicit sandbox-preserving launcher
+  arguments. CI validates the extracted desktop entry. Installed desktop-file
+  association still needs the maintainer's installation check.
 - Native picker and native file-manager drag were verified on Wayland.
   XWayland used the real app with Chromium file-backed drag injection.
 - HTTP/HTTPS/mailto link dispatch was verified with a stubbed OS opener.

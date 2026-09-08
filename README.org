@@ -1,6 +1,8 @@
 #+title: org-preview
 #+subtitle: A live preview for people who write in Org mode
 
+[[file:build/icons/128x128.png]]
+
 * Why
 Org files are comfortable to write and read as plain text. They deserve a
 standalone reader that renders them well, too.
@@ -40,7 +42,6 @@ Use Node.js 24 LTS and npm. No Emacs installation is needed.
 #+begin_src sh
 git clone https://github.com/chadhs/org-preview.git
 cd org-preview
-git switch MVP-v0.1
 npm ci
 npm run dev
 #+end_src
@@ -76,6 +77,7 @@ Run these commands on the target operating system. Build output goes in
 npm run dist:mac    # .dmg and .zip for the Mac's architecture
 npm run dist:linux  # .AppImage and .tar.gz for the Linux machine's architecture
 npm run pack       # Unpacked application for a quick packaging check
+npm run checksums  # SHA-256 sums for the packages in release/
 #+end_src
 
 macOS builds are unsigned prototypes. Signing and notarization are still
@@ -102,8 +104,10 @@ requirement. If AppImage reports a FUSE error on Arch, install =fuse2= or use
 Electron uses the Linux desktop's display stack. For a Wayland session you
 can pass =--ozone-platform=wayland= to the executable. If a compositor has
 problems, test =--ozone-platform=x11= through XWayland. Do not run as root.
-Omarchy/Hyprland needs a manual smoke test on a real desktop. CI exercises
-Linux under Xvfb, which does not establish Wayland compatibility.
+CI exercises Linux under Xvfb and validates the extracted AppImage launcher.
+The AppImage contains desktop metadata and icons; desktop integration tools
+can use them to add a launcher. The portable tar archive does not install
+a launcher or change file associations.
 See [[file:LINUX-TESTING.org][Linux testing results]] for the real Omarchy test run, fixes, screenshots,
 and remaining environment limitations.
 
@@ -130,6 +134,7 @@ Clicking a web link opens your browser. No telemetry or cloud services.
 npm run check       # Parser/file-watcher tests and production renderer build
 npm run test:smoke  # Actual Electron UI and external-save tests
 npm run notices     # Refresh bundled dependency license texts
+npm run icons       # Regenerate native icons from assets/icon.svg
 #+end_src
 
 On a headless Linux machine, run the desktop smoke test with
@@ -160,7 +165,7 @@ See [[file:MACOS-TESTING.org][macOS testing results]] for native checks and rema
 | =examples/welcome.org= | A notebook to try on first launch |
 
 The first commit contains only this project's original goal and scope.
-Prototype implementation lives on =MVP-v0.1=.
+See [[file:RELEASE-NOTES.org][v0.1.0 release notes]] for packages, installation instructions, and known limits.
 
 * License and acknowledgments
 The project uses the [[file:LICENSE][BSD 3-Clause license]]. The [[https://github.com/orgapp/orgajs][Orga]] parser is MIT-licensed.

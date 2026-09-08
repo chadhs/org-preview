@@ -20,7 +20,9 @@
     "dist:mac": "npm run build && electron-builder --mac --publish never",
     "dist:linux": "npm run build && electron-builder --linux --publish never",
     "pack": "npm run build && electron-builder --dir",
-    "notices": "node scripts/notices.mjs"
+    "notices": "node scripts/notices.mjs",
+    "icons": "node scripts/icons.mjs",
+    "checksums": "node scripts/checksums.mjs"
   },
   "build": {
     "appId": "com.chadhs.org-preview",
@@ -50,7 +52,8 @@
         "zip"
       ],
       "category": "public.app-category.productivity",
-      "identity": null
+      "identity": null,
+      "icon": "build/icon.icns"
     },
     "linux": {
       "target": [
@@ -61,11 +64,28 @@
       "executableName": "org-preview",
       "desktop": {
         "entry": {
-          "MimeType": "text/org;text/x-org;",
-          "StartupWMClass": "org-preview"
+          "StartupWMClass": "org-preview",
+          "Name": "Org Preview",
+          "GenericName": "Org document viewer",
+          "Keywords": "org-mode;Emacs;notes;outline;plain text;",
+          "Terminal": "false",
+          "SingleMainWindow": "true"
         }
+      },
+      "icon": "build/icons",
+      "syncDesktopName": true,
+      "executableArgs": [],
+      "mimeTypes": [
+        "text/x-org"
+      ],
+      "description": "Read Org files and follow changes as you save"
+    },
+    "extraResources": [
+      {
+        "from": "build/icons/256x256.png",
+        "to": "icon.png"
       }
-    }
+    ]
   },
   "dependencies": {
     "dompurify": "^3.4.15",
@@ -73,8 +93,10 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
+    "@resvg/resvg-js": "^2.6.2",
     "electron": "^44.2.0",
     "electron-builder": "^26.15.3",
     "vite": "^8.2.2"
-  }
+  },
+  "desktopName": "org-preview.desktop"
 }
