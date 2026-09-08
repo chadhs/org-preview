@@ -29,9 +29,9 @@ Replace =VERSION= below with the version shown on the GitHub release page.
 
 | Platform                 | Package                          |
 |--------------------------+----------------------------------|
-| macOS, Apple Silicon     | Org Preview-VERSION-arm64.dmg       |
-| macOS, Apple Silicon     | Org Preview-VERSION-arm64-mac.zip   |
-| Linux, x86_64            | Org Preview-VERSION.AppImage        |
+| macOS, Apple Silicon     | org-preview-VERSION-arm64.dmg       |
+| macOS, Apple Silicon     | org-preview-VERSION-arm64.zip   |
+| Linux, x86_64            | org-preview-VERSION.AppImage        |
 | Linux, x86_64            | org-preview-VERSION.tar.gz          |
 
 Builds include a platform-specific =SHA256SUMS-*.txt= file. Compare a
@@ -40,7 +40,7 @@ package's SHA-256 with that file before installing. On macOS use
 
 * Install and update
 The [[file:README.org][README installation guide]] covers both platforms step by step:
-- macOS Applications installation, unsigned-app approval, and Finder opening.
+- macOS Applications installation, app-specific first-launch approval, and Finder opening.
 - Omarchy's FUSE-free tar installation, CLI shortcut, and optional app launcher.
 - AppImage alternatives, checksum verification, updates, and first use.
 

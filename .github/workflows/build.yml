@@ -42,9 +42,14 @@ jobs:
       - name: Desktop smoke test on Linux
         if: runner.os == 'Linux'
         run: xvfb-run --auto-servernum npm run test:smoke
-      - name: Package macOS prototype
+      - name: Package macOS application
         if: runner.os == 'macOS'
-        run: npm run dist:mac
+        # PR signing is strictly ad-hoc. No signing certificate, private key,
+        # or notarization credentials are supplied to this read-only build job.
+        env:
+          CSC_FOR_PULL_REQUEST: 'true'
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: env -u CSC_LINK -u CSC_KEY_PASSWORD -u CSC_NAME npm run dist:mac -- -c.mac.identity=- -c.mac.notarize=false
       - name: Package Linux prototype
         if: runner.os == 'Linux'
         run: npm run dist:linux
@@ -65,7 +70,18 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/org-preview-packaged"
           ditto -xk release/*.zip "$RUNNER_TEMP/org-preview-packaged"
+          codesign --verify --deep --strict --verbose=2 "$RUNNER_TEMP/org-preview-packaged/Org Preview.app"
           ORG_PREVIEW_EXECUTABLE="$RUNNER_TEMP/org-preview-packaged/Org Preview.app/Contents/MacOS/Org Preview" node scripts/smoke.mjs
+      - name: Verify the macOS DMG app signature
+        if: runner.os == 'macOS'
+        run: |
+          mountpoint="$RUNNER_TEMP/org-preview-dmg"
+          mkdir -p "$mountpoint"
+          images=(release/*.dmg)
+          test "${#images[@]}" -eq 1
+          hdiutil attach -readonly -nobrowse -mountpoint "$mountpoint" "${images[0]}"
+          trap 'hdiutil detach "$mountpoint"' EXIT
+          codesign --verify --deep --strict --verbose=2 "$mountpoint/Org Preview.app"
       - name: Generate package checksums
         run: npm run checksums
       - uses: actions/upload-artifact@v7.0.1
