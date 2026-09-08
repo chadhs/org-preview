@@ -47,8 +47,8 @@ export async function stampVersion(directory, version) {
 export function assetNames(version) {
   parseVersion(version);
   return [
-    `Org Preview-${version}-arm64.dmg`, `Org Preview-${version}-arm64-mac.zip`,
-    `Org Preview-${version}.AppImage`, `org-preview-${version}.tar.gz`,
+    `org-preview-${version}-arm64.dmg`, `org-preview-${version}-arm64.zip`,
+    `org-preview-${version}.AppImage`, `org-preview-${version}.tar.gz`,
     'SHA256SUMS-darwin-arm64.txt', 'SHA256SUMS-linux-x64.txt',
   ];
 }
@@ -95,7 +95,7 @@ export function releaseNotes({ version, repository, source, changes = '' }) {
     '',
     '### macOS: Apple Silicon',
     '',
-    `1. Download \`Org Preview-${version}-arm64.dmg\` and \`SHA256SUMS-darwin-arm64.txt\` from Assets below. The ZIP is an alternative; GitHub's Source code archives are not installers.`,
+    `1. Download \`org-preview-${version}-arm64.dmg\` and \`SHA256SUMS-darwin-arm64.txt\` from Assets below. The ZIP is an alternative; GitHub's Source code archives are not installers.`,
     '2. Quit older copies. Open the DMG, drag Org Preview.app into Applications, and eject the disk image.',
     '3. Launch the Applications copy. If macOS cannot verify the developer and you trust this repository, first try opening the app, then use System Settings → Privacy & Security → Open Anyway and confirm Open. These builds are unsigned and unnotarized.',
     '4. Click Open file, press ⌘O, drag in an Org file, or use Finder → Open With → Org Preview. Keep one installed copy.',
@@ -117,7 +117,7 @@ export function releaseNotes({ version, repository, source, changes = '' }) {
     '',
     `Use Open file, Ctrl+O, or drag-and-drop. Open notebooks from the terminal with \`~/.local/bin/org-preview ~/notes/today.org\`. The [installation guide](${guide}) includes an optional app-launcher entry, default file associations, and update instructions. No AUR/pacman package is supplied.`,
     '',
-    `Alternatively download \`Org Preview-${version}.AppImage\`, make it executable, and run it with \`--appimage-extract-and-run\` when FUSE 2 is absent. Native Wayland and XWayland were tested on Omarchy. Run as your normal user with sandboxing enabled.`,
+    `Alternatively download \`org-preview-${version}.AppImage\`, make it executable, and run it with \`--appimage-extract-and-run\` when FUSE 2 is absent. Native Wayland and XWayland were tested on Omarchy. Run as your normal user with sandboxing enabled.`,
     '',
     'Compare downloads with the supplied SHA-256 files using `shasum -a 256` on macOS or `sha256sum` on Linux. To update, quit the app and repeat installation for the new version; there is no in-app updater.',
     '',
@@ -130,9 +130,22 @@ export function releaseNotes({ version, repository, source, changes = '' }) {
     changes,
   ].join('\n');
 }
+// The tag endpoint can omit drafts, even for authenticated callers. List
+// releases as a fallback so an interrupted upload resumes the existing draft.
+export async function findRelease(github, tag) {
+  const published = await github.request('GET', `/releases/tags/${tag}`, undefined, true);
+  if (published) return published;
+  for (let page = 1; ; page++) {
+    const releases = await github.request('GET', `/releases?per_page=100&page=${page}`);
+    if (!Array.isArray(releases)) throw new Error('Unexpected release-list response.');
+    const found = releases.find((release) => release.tag_name === tag);
+    if (found) return found;
+    if (releases.length < 100) return null;
+  }
+}
 // A failed upload leaves a draft. Published releases and their assets are never replaced.
 export async function uploadAndPublish(github, plan, assets, body) {
-  let release = await github.request('GET', `/releases/tags/${plan.tag}`, undefined, true);
+  let release = await findRelease(github, plan.tag);
   if (release && !release.draft) return release;
   if (!release) release = await github.request('POST', '/releases', { tag_name: plan.tag, name: `Org Preview ${plan.tag}`, body, draft: true, prerelease: false });
   else {
@@ -141,7 +154,7 @@ export async function uploadAndPublish(github, plan, assets, body) {
   }
   for (const asset of assets) {
     const uploaded = await github.upload(release.upload_url, asset);
-    if (uploaded.state !== 'uploaded' || uploaded.size !== asset.size || (uploaded.digest && uploaded.digest !== asset.digest)) throw new Error(`Upload verification failed: ${asset.name}`);
+    if (uploaded.name !== asset.name || uploaded.state !== 'uploaded' || uploaded.size !== asset.size || (uploaded.digest && uploaded.digest !== asset.digest)) throw new Error(`Upload verification failed: ${asset.name}`);
   }
   const latest = await github.request('GET', '/releases/latest', undefined, true);
   const makeLatest = !latest || !/^v\d+\.\d+\.\d+$/.test(latest.tag_name) || compareVersions(plan.version, latest.tag_name.slice(1)) >= 0;

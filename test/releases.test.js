@@ -62,20 +62,21 @@ test('all six assets and matching checksums are required before publication', as
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
 
-function fakeGitHub({ existing = null, failUpload = false, latest = null } = {}) {
+function fakeGitHub({ existing = null, failUpload = false, latest = null, draftOnly = false } = {}) {
   const calls = [];
   return {
     calls,
     async request(method, endpoint, body) {
       calls.push({ method, endpoint, body });
-      if (endpoint.includes('/releases/tags/')) return existing;
+      if (endpoint.includes('/releases/tags/')) return draftOnly ? null : existing;
+      if (endpoint.startsWith('/releases?')) return existing ? [existing] : [];
       if (endpoint === '/releases/latest') return latest;
       return { id: 1, draft: true, upload_url: 'https://uploads.github.com/test', assets: [], ...body };
     },
     async upload(_url, asset) {
       calls.push({ method: 'UPLOAD', asset: asset.name });
       if (failUpload) throw new Error('Network interrupted');
-      return { state: 'uploaded', size: asset.size, digest: asset.digest };
+      return { name: asset.name, state: 'uploaded', size: asset.size, digest: asset.digest };
     },
   };
 }
@@ -105,7 +106,7 @@ test('published releases are untouched, draft retries replace partial assets, ol
 
 test('release notes use the actual version and source, without stale publication instructions', () => {
   const notes = releaseNotes({ version: '0.12.0', repository: 'chadhs/org-preview', source, changes: 'Merged feature A.' });
-  assert.match(notes, /Org Preview-0\.12\.0-arm64\.dmg/);
+  assert.match(notes, /org-preview-0\.12\.0-arm64\.dmg/);
   assert.match(notes, /org-preview-0\.12\.0\.tar\.gz/);
   assert.match(notes, /ORG_PREVIEW_VERSION=0\.12\.0/);
   assert.ok(notes.includes('/blob/v0.12.0/README.org#install'));
@@ -124,4 +125,20 @@ test('manual recovery and merged-PR fallback only allow trusted main events', ()
     assert.throws(() => assertMainRelease({ ...merged, ...change }), /trusted main/);
   }
   assert.throws(() => assertMainRelease({ ...main, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/feature' }), /trusted main/);
+});
+
+
+test('draft retries work when GitHub omits the draft from the tag endpoint', async () => {
+  const api = fakeGitHub({ existing: { id: 1, tag_name: 'v0.1.0', draft: true, upload_url: 'https://uploads.github.com/test', assets: [] }, draftOnly: true });
+  await uploadAndPublish(api, plan, assets, 'Notes');
+  assert.ok(api.calls.some((call) => call.endpoint.startsWith('/releases?')));
+  assert.ok(!api.calls.some((call) => call.method === 'POST'));
+  assert.equal(api.calls.at(-1).body.draft, false);
+});
+
+test('renamed uploads are rejected before publication', async () => {
+  const api = fakeGitHub();
+  api.upload = async (_url, asset) => ({ name: 'unexpected-name.dmg', state: 'uploaded', size: asset.size, digest: asset.digest });
+  await assert.rejects(uploadAndPublish(api, plan, assets, 'Notes'), /Upload verification failed/);
+  assert.ok(!api.calls.some((call) => call.body?.draft === false));
 });

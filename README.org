@@ -26,9 +26,9 @@ Choose the application package below, not GitHub's *Source code* archives.
 
 | Your system              | Download                           |
 |--------------------------+------------------------------------|
-| macOS, Apple Silicon     | Org Preview-VERSION-arm64.dmg       |
+| macOS, Apple Silicon     | org-preview-VERSION-arm64.dmg       |
 | Omarchy / Arch, x86_64    | org-preview-VERSION.tar.gz          |
-| Linux portable alternative | Org Preview-VERSION.AppImage     |
+| Linux portable alternative | org-preview-VERSION.AppImage     |
 
 =VERSION= means the number on the release page, without the =v= prefix.
 Download the matching =SHA256SUMS-darwin-arm64.txt= or
@@ -143,8 +143,8 @@ on Omarchy:
 #+begin_src sh
 ORG_PREVIEW_VERSION=0.1.0
 cd "$HOME/Downloads"
-chmod +x "Org Preview-$ORG_PREVIEW_VERSION.AppImage"
-"./Org Preview-$ORG_PREVIEW_VERSION.AppImage" --appimage-extract-and-run
+chmod +x "org-preview-$ORG_PREVIEW_VERSION.AppImage"
+"./org-preview-$ORG_PREVIEW_VERSION.AppImage" --appimage-extract-and-run
 #+end_src
 
 If [[https://archlinux.org/packages/extra/x86_64/fuse2/][fuse2]] is installed, you can omit =--appimage-extract-and-run=.
@@ -172,7 +172,7 @@ the first release; change the version for a later download.
 #+begin_src sh
 # macOS:
 cd "$HOME/Downloads"
-shasum -a 256 'Org Preview-0.1.0-arm64.dmg'
+shasum -a 256 'org-preview-0.1.0-arm64.dmg'
 
 # Omarchy / Linux:
 cd "$HOME/Downloads"

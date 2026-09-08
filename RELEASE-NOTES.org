@@ -29,9 +29,9 @@ Replace =VERSION= below with the version shown on the GitHub release page.
 
 | Platform                 | Package                          |
 |--------------------------+----------------------------------|
-| macOS, Apple Silicon     | Org Preview-VERSION-arm64.dmg       |
-| macOS, Apple Silicon     | Org Preview-VERSION-arm64-mac.zip   |
-| Linux, x86_64            | Org Preview-VERSION.AppImage        |
+| macOS, Apple Silicon     | org-preview-VERSION-arm64.dmg       |
+| macOS, Apple Silicon     | org-preview-VERSION-arm64.zip   |
+| Linux, x86_64            | org-preview-VERSION.AppImage        |
 | Linux, x86_64            | org-preview-VERSION.tar.gz          |
 
 Builds include a platform-specific =SHA256SUMS-*.txt= file. Compare a

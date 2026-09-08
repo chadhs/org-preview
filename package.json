@@ -53,7 +53,8 @@
       ],
       "category": "public.app-category.productivity",
       "identity": null,
-      "icon": "build/icon.icns"
+      "icon": "build/icon.icns",
+      "artifactName": "org-preview-${version}-${arch}.${ext}"
     },
     "linux": {
       "target": [
@@ -77,7 +78,8 @@
       "mimeTypes": [
         "text/x-org"
       ],
-      "description": "Read Org files and follow changes as you save"
+      "description": "Read Org files and follow changes as you save",
+      "artifactName": "org-preview-${version}.${ext}"
     },
     "extraResources": [
       {

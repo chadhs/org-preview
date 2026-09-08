@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { readFile, appendFile } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import path from 'node:path';
-import { planRelease, stampVersion, verifyAssets, assertMainRelease, releaseNotes, uploadAndPublish } from './lib/releases.mjs';
+import { planRelease, stampVersion, verifyAssets, assertMainRelease, releaseNotes, uploadAndPublish, findRelease } from './lib/releases.mjs';
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
 const command = process.argv[2];
@@ -46,7 +46,7 @@ if (command === 'stamp') {
   const initial = JSON.parse(await readFile('package.json', 'utf8')).version;
   const plan = planRelease(initial, tags, source);
   if (command === 'plan') {
-    const existing = plan.existing ? await github.request('GET', `/releases/tags/${plan.tag}`, undefined, true) : null;
+    const existing = plan.existing ? await findRelease(github, plan.tag) : null;
     const output = { version: plan.version, source, published: String(Boolean(existing && !existing.draft)) };
     if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
     console.log(JSON.stringify(output));
@@ -68,7 +68,7 @@ if (command === 'stamp') {
       commit = git('rev-parse', 'HEAD');
       git('push', 'origin', `${commit}:refs/tags/${plan.tag}`);
     }
-    const existing = await github.request('GET', `/releases/tags/${plan.tag}`, undefined, true);
+    const existing = await findRelease(github, plan.tag);
     if (existing && !existing.draft) console.log(`Already published: ${existing.html_url}`);
     else {
       const generated = plan.previous ? await github.request('POST', '/releases/generate-notes', { tag_name: plan.tag, target_commitish: commit, previous_tag_name: plan.previous }) : { body: '### Changes\n\nFirst public release of Org Preview.' };
