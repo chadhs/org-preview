@@ -3,6 +3,8 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { readDocument, watchDocument } = require('./documents.cjs');
 const { documentArgument } = require('./arguments.cjs');
+const { configureGraphics } = require('./graphics.cjs');
+configureGraphics(app.commandLine);
 let win, current, stopWatching;
 let openRevision = 0;
 let pendingPath = documentArgument(process.argv, app.isPackaged);

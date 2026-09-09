@@ -123,7 +123,7 @@ export function releaseNotes({ version, repository, source, changes = '' }) {
     '',
     '### Known limits',
     '',
-    'One UTF-8 document at a time, up to 4 MB. Editing, full Emacs export parity, local image/file links, math/diagrams, Babel, Quick Look, Developer ID signing/notarization, and auto-updates remain outside scope. Intel Mac builds are not supplied.',
+    'One UTF-8 document at a time, up to 16 MiB. Editing, full Emacs export parity, local image/file links, math/diagrams, Babel, Quick Look, Developer ID signing/notarization, and auto-updates remain outside scope. Intel Mac builds are not supplied.',
     '',
     `[Release information](https://github.com/${repository}/blob/v${version}/RELEASE-NOTES.org) · [Merged source](https://github.com/${repository}/commit/${source})`,
     '',

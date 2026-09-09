@@ -17,6 +17,8 @@ try {
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   app = await electron.launch({ executablePath, args: [...appArgs, file, profileArg, ...process.argv.slice(2)], env, chromiumSandbox: true });
+  let stderr = '';
+  app.process().stderr.on('data', (chunk) => { stderr += chunk; });
   let window = await app.firstWindow();
   expect(app.process().spawnargs).not.toContain('--no-sandbox');
   expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences().sandbox)).toBe(true);
@@ -69,7 +71,7 @@ try {
   const unsupported = path.join(directory, 'unsupported.txt');
   const oversized = path.join(directory, 'oversized.org');
   await writeFile(unsupported, 'Unsupported');
-  await writeFile(oversized, Buffer.alloc(4 * 1024 * 1024 + 1));
+  await writeFile(oversized, Buffer.alloc(16 * 1024 * 1024 + 1));
   // File-backed Chromium drops exercise Electron's webUtils.getPathForFile.
   const cdp = await window.context().newCDPSession(window);
   async function drop(filePath) {
@@ -90,10 +92,34 @@ try {
   await drop(unsupported);
   await expect(window.locator('#error')).toContainText('Choose an .org file.');
   await drop(oversized);
-  await expect(window.locator('#error')).toContainText('up to 4 MB');
+  await expect(window.locator('#error')).toContainText('up to 16 MiB');
   await drop(file);
   await expect(window.locator('#error')).toBeHidden();
   await expect(window.locator('#filename')).toHaveText(path.basename(file));
+  // Keep fixtures synthetic: personal configs must never enter CI artifacts.
+  const large = path.join(directory, 'large.org');
+  const largeSource = '#+title: Large notebook\n* Notes\n' +
+    'A paragraph with *bold* text.\n\n'.repeat(3000) +
+    '\n#+begin_src emacs-lisp\n' + ('; ' + 'x'.repeat(4093) + '\n').repeat(1280) +
+    '#+end_src\n* Final heading\nLast sentence.';
+  await writeFile(large, largeSource);
+  await drop(large);
+  await expect(window.locator('#document-title')).toHaveText('Large notebook', { timeout: 30000 });
+  await expect(window.locator('#error')).toBeHidden();
+  await expect(window.locator('#content strong')).toHaveCount(3000);
+  await expect(window.locator('#outline .outline-item')).toHaveCount(2);
+  await window.locator('#outline .outline-item').last().click();
+  await expect(window.locator('#content h2').last()).toBeInViewport();
+  await window.locator('#source-tab').click();
+  expect(await window.locator('#source').textContent()).toBe(largeSource);
+  await window.locator('#preview-tab').click();
+  await window.locator('#find-button').click();
+  await window.locator('#search').fill('Last sentence');
+  await expect(window.locator('#search-count')).toHaveText('1 / 1');
+  await window.locator('#close-search').click();
+  await writeFile(large, largeSource.replace('Last sentence.', 'Saved large document.'));
+  await expect(window.locator('#source')).toContainText('Saved large document.', { timeout: 30000 });
+  await expect(window.locator('#error')).toBeHidden();
   // A second CLI invocation must report bad input instead of ignoring it.
   const child = spawn(app.process().spawnfile, [...appArgs, unsupported, profileArg], { env, stdio: 'ignore' });
   await new Promise((resolve, reject) => {
@@ -147,7 +173,8 @@ try {
   await window.screenshot({ path: `test-results/${screenshotPrefix}-dark.png` });
   await window.locator('#theme').selectOption('system');
   expect(errors).toEqual([]);
-  console.log(`Desktop smoke passed (${executablePath ? 'packaged' : 'development'}): open, file-backed drops, Unicode paths, input errors, CLI handoff${process.platform === 'darwin' ? ', macOS window reopening' : ''}, render, source, themes, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, sandbox, and HTML safety.`);
+  expect(stderr).not.toContain('not compatible with Vulkan');
+  console.log(`Desktop smoke passed (${executablePath ? 'packaged' : 'development'}): open, file-backed drops, Unicode paths, input errors, CLI handoff${process.platform === 'darwin' ? ', macOS window reopening' : ''}, render, source, themes, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, large documents, sandbox, HTML safety, and no Vulkan compatibility warning.`);
 } finally {
   await app?.close();
   await rm(directory, { recursive: true, force: true });
