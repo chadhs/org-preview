@@ -77,7 +77,7 @@ export async function checkAppearance(window) {
   await expect(window.locator('#search')).toHaveValue('Read');
   await expect(window.locator('#search-count')).toContainText('/ 1');
   await window.locator('#appearance-button').click();
-  await window.locator('#document-title').click();
+  await window.locator('#sidebar .sidebar-label').first().click();
   await expect(window.locator('#appearance-panel')).toBeHidden();
   await expect(window.locator('#appearance-button')).toHaveAttribute('aria-expanded', 'false');
   await window.locator('#close-search').click();
