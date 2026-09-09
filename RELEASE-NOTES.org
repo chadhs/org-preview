@@ -6,6 +6,17 @@ pass. The first version is =0.1.0=, followed by =0.2.0=, =0.3.0=, and so on.
 The GitHub release page contains the exact version, changes, downloads,
 and checksums. Pull requests do not publish releases.
 
+* Theme preferences for v0.5.0
+- Add Solarized Light and Solarized Dark across the reader and app controls.
+- Name the original themes Default Light and Default Dark, preserving their colors.
+- Replace the theme dropdown with an Appearance panel containing mode and
+  separate light and dark theme preferences.
+- Follow device appearance changes in System mode using the preferred pair.
+  Manual Light and Dark modes use their corresponding preferred theme.
+- Save preferences immediately and preserve existing appearance settings.
+- Add an optional Sans-serif headings preference for document titles and headings
+  across all themes, with the original heading fonts kept by default.
+
 * A live reader for Org files
 Org Preview opens local =.org= files and refreshes the document when you
 save in your editor. It runs on macOS and Linux without requiring Emacs,

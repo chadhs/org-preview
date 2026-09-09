@@ -21,7 +21,7 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 .segmented button { color: var(--muted); padding: 5px 13px; font-size: 12px; }
 .segmented button[aria-pressed='true'] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px #00000014; }
 select { border: 0; border-radius: 5px; padding: 6px; background: var(--chrome); font-size: 12px; }
-.primary { background: var(--accent); color: #fff; display: flex; align-items: center; gap: 8px; padding: 8px 11px; font-size: 12px; }
+.primary { background: var(--accent); color: var(--primary-ink); display: flex; align-items: center; gap: 8px; padding: 8px 11px; font-size: 12px; }
 .primary:hover { background: var(--accent-hover); }
 .shortcut { opacity: .65; margin-left: 10px; font-size: 10px; }
 .workspace { display: flex; flex: 1; min-height: 0; }
@@ -59,6 +59,7 @@ h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 3.6v
 #content h2 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: 27px; margin: 36px 0 14px; }
 #content h3 { font-size: 18px; font-weight: 550; margin: 28px 0 12px; }
 #content h4, #content h5, #content h6 { font-size: 16px; margin: 24px 0 10px; }
+:root[data-heading-font='sans-serif'] #document :is(h1, h2, h3, h4, h5, h6) { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 #content > :first-child { margin-top: 0; }
 a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 code, pre { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; }
@@ -102,6 +103,16 @@ tr:last-child td { border-bottom: 0; }
 #drop-overlay { position: fixed; inset: 12px; background: var(--paper); opacity: .97; z-index: 10; border: 2px dashed var(--accent); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
 #drop-overlay p { color: var(--muted); }
 @media (max-width: 950px) { .toolbar { padding: 0 16px; } .toolbar-actions { gap: 5px; } #sidebar { width: 220px; } #document { padding: 40px 34px 25px; } .page-top { padding: 20px 34px 0; } .version, .shortcut { display: none; } }
-@media print { .toolbar, #sidebar, .statusbar, .page-top, #search-bar, #error, .document-end { display: none !important; } body, #app, .workspace { display: block; height: auto; } #reader { overflow: visible; } #document { padding: 0; max-width: none; } }
-::highlight(search-results) { background: #ead597; color: #292c26; }
-::highlight(search-active) { background: #bc633a; color: #fff; }
+@media print { #appearance-panel, .toolbar, #sidebar, .statusbar, .page-top, #search-bar, #error, .document-end { display: none !important; } body, #app, .workspace { display: block; height: auto; } #reader { overflow: visible; } #document { padding: 0; max-width: none; } }
+::highlight(search-results) { background: var(--search-wash); color: var(--search-ink); }
+::highlight(search-active) { background: var(--search-active-wash); color: var(--search-active-ink); }
+
+#appearance-button { font-size: 12px; }
+#appearance-panel { position: fixed; inset: auto; margin: 0; width: 300px; max-width: calc(100vw - 24px); padding: 18px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--chrome); color: var(--ink); box-shadow: 0 8px 28px #00000026; }
+#appearance-panel:popover-open { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; }
+#appearance-title { grid-column: 1 / -1; margin: 0 0 4px; font-size: 14px; font-weight: 600; }
+#appearance-panel label { font-size: 12px; }
+#appearance-panel select { width: 100%; background: var(--paper); border: 1px solid var(--line-strong); padding: 7px; }
+#appearance-panel .appearance-checkbox { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; cursor: pointer; }
+#sans-serif-headings { margin: 0; accent-color: var(--accent); }
+#appearance-panel p { grid-column: 1 / -1; margin: 2px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }

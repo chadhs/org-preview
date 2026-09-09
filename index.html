@@ -14,7 +14,18 @@
           <button id="toggle-outline" class="icon-button" aria-label="Toggle outline" title="Toggle outline"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M8 4v12"/></svg></button>
           <div class="segmented" aria-label="Document view"><button id="preview-tab" aria-pressed="true">Preview</button><button id="source-tab" aria-pressed="false">Source</button></div>
           <button id="find-button" class="icon-button" aria-label="Find in document" title="Find in document"><svg viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg></button>
-          <select id="theme" aria-label="Appearance"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+          <button id="appearance-button" popovertarget="appearance-panel" aria-haspopup="dialog" aria-controls="appearance-panel" aria-expanded="false">Appearance</button>
+          <div id="appearance-panel" popover role="dialog" aria-labelledby="appearance-title">
+            <h2 id="appearance-title">Appearance</h2>
+            <label for="appearance-mode">Mode</label>
+            <select id="appearance-mode"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+            <label for="light-theme">Light theme</label>
+            <select id="light-theme"><option value="light">Default Light</option><option value="solarized-light">Solarized Light</option></select>
+            <label for="dark-theme">Dark theme</label>
+            <select id="dark-theme"><option value="dark">Default Dark</option><option value="solarized-dark">Solarized Dark</option></select>
+            <label class="appearance-checkbox"><input id="sans-serif-headings" type="checkbox">Sans-serif headings</label>
+            <p>System follows your device's light or dark mode.</p>
+          </div>
           <button id="open" class="primary"><svg viewBox="0 0 20 20"><path d="M2 6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1Z"/></svg>Open file<span class="shortcut" id="open-shortcut">⌘O</span></button>
         </div>
       </header>

@@ -3,6 +3,9 @@ import { version as appVersion } from '../package.json';
 import { renderOrg } from './org.js';
 import './style.css';
 import { createSearch } from './search.js';
+import { initializeAppearance } from './appearance.js';
+
+initializeAppearance();
 
 const $ = (selector) => document.querySelector(selector);
 const api = window.orgPreview;
@@ -117,11 +120,6 @@ $('#find-next').addEventListener('click', () => finder.search($('#search').value
 $('#find-prev').addEventListener('click', () => finder.search($('#search').value, false));
 api.onCommand((command) => { if (command === 'find') showSearch(); if (command === 'source') setView(!sourceMode); });
 document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { showSearch(false); $('#drop-overlay').hidden = true; } });
-const storedTheme = localStorage.getItem('org-preview-theme') || 'system';
-$('#theme').value = ['system', 'light', 'dark'].includes(storedTheme) ? storedTheme : 'system';
-function updateTheme() { document.documentElement.dataset.theme = $('#theme').value; localStorage.setItem('org-preview-theme', $('#theme').value); }
-$('#theme').addEventListener('change', updateTheme);
-updateTheme();
 if (!navigator.platform.includes('Mac')) $('#open-shortcut').textContent = 'Ctrl O';
 let dragDepth = 0;
 document.addEventListener('dragenter', (event) => { event.preventDefault(); if (event.dataTransfer.types.includes('Files')) { dragDepth++; $('#drop-overlay').hidden = false; } });

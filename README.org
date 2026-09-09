@@ -14,6 +14,22 @@ Dark preview showing Org tables and source blocks:
 
 [[file:docs/screenshots/preview-dark.png]]
 
+* Appearance
+Open *Appearance* in the toolbar to choose *System*, *Light*, or *Dark* mode.
+Choose a light theme and a dark theme independently:
+
+- *Default Light* and *Default Dark* keep Org Preview's original colors.
+- *Solarized Light* and *Solarized Dark* use the [[https://ethanschoonover.com/solarized/][Solarized palette]].
+
+System switches between your preferred themes when your device changes
+appearance. Light and Dark stay in the selected mode. Both theme preferences
+remain editable in every mode, and changes save immediately for the next launch.
+Existing installations keep their mode and use the default theme pair.
+
+Enable *Sans-serif headings* to use the app's sans-serif font for the document
+title and headings. This preference applies to every theme and saves immediately.
+It starts off, preserving the original heading fonts.
+
 * Install
 You do not need Node.js, npm, or Emacs to use a downloaded release.
 Supported downloads are macOS Apple Silicon and Linux x86_64, including
