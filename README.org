@@ -223,6 +223,10 @@ app first. On macOS, replace the Applications copy. On Omarchy, rerun the
 tar installation and desktop-entry blocks with the new version; they update
 the command link and icon path. Your Org files are independent of the app.
 
+On Wayland, Org Preview avoids Chromium's incompatible Vulkan startup paths
+and uses OpenGL acceleration. No extra launcher flags are needed. An explicit
+=--ozone-platform=x11= launch keeps the default X11 graphics configuration.
+
 * Why
 Org files are comfortable to write and read as plain text. They deserve a
 standalone reader that renders them well, too.
@@ -282,7 +286,8 @@ npm start -- ~/notes/today.org
 Open files with the toolbar, drag and drop, or =Cmd/Ctrl+O=. Save in your
 editor to refresh the preview. The app polls the open file every 300 ms and
 keeps watching after atomic saves or deletion and recreation. It opens one
-file at a time and supports UTF-8 files up to 4 MB.
+file at a time and supports UTF-8 files up to 16 MiB. Large documents can take
+longer to render, depending on their structure.
 
 Use =Cmd/Ctrl+F= to search. Enter advances to the next match and Shift+Enter
 moves back. Search stays inside the current document view and shows up to
@@ -363,6 +368,16 @@ Raw export blocks display as text. Babel, includes, embedded HTML, and
 custom URL handlers never execute. Documents cannot fetch network resources.
 Clicking a web link opens your browser. No telemetry or cloud services.
 
+* Parser patches
+Orga 4.7.1 recursively advances through tokens and can exhaust Electron's
+JavaScript stack on long sections. =patches/orga+4.7.1.patch= replaces those
+tail calls with an iterative loop and appends tokens without copying the
+entire token history. =npm ci= applies the patches through =patch-package=
+and fails if they no longer apply.
+=patches/text-kit+4.5.1.patch= changes character-to-line lookup from a linear
+scan to binary search and reuses position helpers between range readers.
+Both versions stay pinned until upstream fixes replace these patches.
+
 * Development and checks
 #+begin_src sh
 npm run check       # Parser/file-watcher tests and production renderer build
@@ -380,6 +395,8 @@ The smoke test requires Chromium sandboxing and checks rendering, source
 view, themes, search and scroll preservation, Unicode file opening,
 file-backed drops, input errors, CLI handoff, saves, atomic replacement,
 delete/recreate recovery, watcher switching, and supported-link dispatch.
+It also opens and live-reloads a document over 5 MiB, checks its source,
+search, and outline, and rejects the Wayland Vulkan warning in startup logs.
 Screenshots are saved in =test-results/=.
 
 The smoke test uses a disposable profile. To test a packaged executable, set

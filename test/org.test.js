@@ -55,3 +55,25 @@ test('mixed list markers split into ordered and unordered lists while keeping ne
   assert.match(html, /<ul><li>Bullet\s*<ul><li>Nested\s*<\/li><\/ul><\/li><\/ul><ol>/);
   assert.match(html, /<li>First\s*<\/li><li>Second\s*<ul><li>Inside second\s*<\/li><\/ul><\/li><\/ol><ul><li>Back to bullets/);
 });
+
+test('a long section does not exhaust the parser stack or lose its final content', () => {
+  const source = '#+title: Long notebook\n* Notes\n' +
+    'A paragraph with *bold* text.\n\n'.repeat(3000) +
+    '** Last heading\n[[*Notes][Back to notes]]\nFinal paragraph.';
+  const result = renderOrg(source);
+  assert.equal(result.title, 'Long notebook');
+  assert.equal(result.outline.length, 2);
+  assert.equal((result.html.match(/<strong>bold<\/strong>/g) || []).length, 3000);
+  assert.match(result.html, /href="#org-notes"/);
+  assert.match(result.html, /Final paragraph\.<\/p>$/);
+});
+
+test('multi-megabyte source blocks remain complete and escaped', () => {
+  const code = ('<config> ' + 'x'.repeat(4086) + '\n').repeat(1280);
+  assert.ok(Buffer.byteLength(code) > 4 * 1024 * 1024);
+  const result = renderOrg('#+title: Large config\n* Configuration\n#+begin_src emacs-lisp\n' + code + '#+end_src\n* End\nFinished.');
+  assert.equal(result.outline.length, 2);
+  assert.equal((result.html.match(/&lt;config&gt;/g) || []).length, 1280);
+  assert.doesNotMatch(result.html, /<config>/);
+  assert.match(result.html, /Finished\.<\/p>$/);
+});

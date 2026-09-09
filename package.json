@@ -22,7 +22,8 @@
     "pack": "npm run build && electron-builder --dir",
     "notices": "node scripts/notices.mjs",
     "icons": "node scripts/icons.mjs",
-    "checksums": "node scripts/checksums.mjs"
+    "checksums": "node scripts/checksums.mjs",
+    "postinstall": "patch-package --error-on-fail"
   },
   "build": {
     "appId": "com.chadhs.org-preview",
@@ -93,14 +94,18 @@
   "dependencies": {
     "dompurify": "^3.4.15",
     "highlight.js": "11.12.0",
-    "orga": "^4.7.1"
+    "orga": "4.7.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@resvg/resvg-js": "^2.6.2",
     "electron": "^44.2.0",
     "electron-builder": "^26.15.3",
+    "patch-package": "8.0.1",
     "vite": "^8.2.2"
   },
-  "desktopName": "org-preview.desktop"
+  "desktopName": "org-preview.desktop",
+  "overrides": {
+    "text-kit": "4.5.1"
+  }
 }

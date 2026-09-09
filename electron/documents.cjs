@@ -1,7 +1,8 @@
 const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const path = require('node:path');
-const MAX_BYTES = 4 * 1024 * 1024;
+const MAX_BYTES = 16 * 1024 * 1024;
+const sizeError = () => new Error('Org Preview supports files up to 16 MiB.');
 
 async function readDocument(filePath) {
   if (typeof filePath !== 'string' || path.extname(filePath).toLowerCase() !== '.org') throw new Error('Choose an .org file.');
@@ -10,16 +11,18 @@ async function readDocument(filePath) {
   try {
     const stat = await handle.stat();
     if (!stat.isFile()) throw new Error('Choose a file, not a directory.');
-    if (stat.size > MAX_BYTES) throw new Error('This prototype supports files up to 4 MB.');
-    const buffer = Buffer.alloc(MAX_BYTES + 1);
+    if (stat.size > MAX_BYTES) throw sizeError();
+    const chunks = [];
     let total = 0;
-    while (total < buffer.length) {
-      const { bytesRead } = await handle.read(buffer, total, buffer.length - total, null);
+    while (total <= MAX_BYTES) {
+      const buffer = Buffer.alloc(Math.min(64 * 1024, MAX_BYTES + 1 - total));
+      const { bytesRead } = await handle.read(buffer, 0, buffer.length, null);
       if (!bytesRead) break;
       total += bytesRead;
+      chunks.push(buffer.subarray(0, bytesRead));
     }
-    if (total > MAX_BYTES) throw new Error('This prototype supports files up to 4 MB.');
-    return { path: absolute, name: path.basename(absolute), source: buffer.subarray(0, total).toString('utf8'), modified: stat.mtimeMs, size: total };
+    if (total > MAX_BYTES) throw sizeError();
+    return { path: absolute, name: path.basename(absolute), source: Buffer.concat(chunks, total).toString('utf8'), modified: stat.mtimeMs, size: total };
   } finally { await handle.close(); }
 }
 

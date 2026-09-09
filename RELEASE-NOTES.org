@@ -21,6 +21,16 @@ and checksums. Pull requests do not publish releases.
   fallback for unsupported languages and large blocks. The Org source view
   remains plain text.
 
+* v0.4.0
+- Fix the parser stack overflow when opening long Org sections, including
+  literate Emacs configurations.
+- Raise the UTF-8 file limit from 4 MiB to 16 MiB.
+- Reduce parser overhead for line lookup, range readers, and token storage.
+- Avoid Vulkan initialization on Linux Wayland, including its WebGPU interop
+  path, while retaining OpenGL acceleration and renderer sandboxing.
+- Test multi-megabyte documents, source view, search, outline navigation,
+  and live saves in the desktop smoke suite.
+
 * A live reader for Org files
 Org Preview opens local =.org= files and refreshes the document when you
 save in your editor. It runs on macOS and Linux without requiring Emacs,
@@ -64,7 +74,7 @@ Linux test platform, with both Wayland and XWayland verified. There is no
 AUR or pacman package yet.
 
 * Known limits
-- One document at a time, UTF-8, up to 4 MB.
+- One document at a time, UTF-8, up to 16 MiB.
 - This is a reader. Keep editing in your existing editor.
 - Org rendering covers the documented subset, not full Emacs export parity.
 - Local images and links to other files, math, diagrams, Babel, remote
