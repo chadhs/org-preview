@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('orgPreview', {
   droppedPath: (file) => webUtils.getPathForFile(file),
   initial: () => ipcRenderer.invoke('document:initial'),
   reveal: () => ipcRenderer.invoke('document:reveal'),
+  image: (documentPath, reference) => ipcRenderer.invoke('image:read', documentPath, reference),
   external: (url) => ipcRenderer.invoke('link:external', url),
   onDocument: (callback) => {
     const listener = (_event, doc) => callback(doc);

@@ -23,7 +23,7 @@ test('emphasis, nested lists, checkboxes, tables and source blocks', () => {
   assert.match(html, /Done\s*<ul><li>Nested\s*<\/li><\/ul><\/li>/);
   assert.match(html, /disabled checked/);
   assert.match(html, /<thead><tr><th> Name <\/th>/);
-  assert.match(html, /console.log\(&quot;&lt;hello&gt;&quot;\)/);
+  assert.match(html.replace(/<\/?span\b[^>]*>/g, ''), /console.log\(&quot;&lt;hello&gt;&quot;\)/);
 });
 
 test('embedded HTML, code, attributes and unsafe links stay inert', () => {

@@ -4,6 +4,9 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { checkAppearance, setAppearance, captureAppearances } from './lib/appearance-smoke.mjs';
+import { checkHighlighting } from './lib/highlight-smoke.mjs';
+import { checkImages } from './lib/images-smoke.mjs';
 
 const directory = await mkdtemp(path.join(tmpdir(), 'org-preview-smoke-'));
 const file = path.join(directory, 'smoke café 日本語.org');
@@ -35,9 +38,7 @@ try {
   await expect(window.locator('#source')).toBeVisible();
   await expect(window.locator('#source')).toContainText('#+title: Desktop smoke test');
   await window.locator('#preview-tab').click();
-  await window.locator('#theme').selectOption('dark');
-  await expect(window.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await window.locator('#theme').selectOption('light');
+  await checkAppearance(window);
   await window.locator('#find-button').click();
   await window.locator('#search').fill('Read');
   await expect(window.locator('#search-count')).toContainText('/ 1');
@@ -51,6 +52,21 @@ try {
   await window.locator('#search').press('Enter');
   await expect(window.locator('#search-count')).toHaveText('2 / 2');
   await window.locator('#reader').evaluate((reader) => { reader.scrollTop = 1000; });
+  await window.evaluate(() => { window.originalContent = document.querySelector('#content').firstChild; });
+  await setAppearance(window, { mode: 'dark', dark: 'solarized-dark' });
+  expect(await window.locator('#reader').evaluate((reader) => reader.scrollTop)).toBe(1000);
+  expect(await window.evaluate(() => window.originalContent === document.querySelector('#content').firstChild)).toBe(true);
+  await expect(window.locator('#search-count')).toHaveText('2 / 2');
+  await window.keyboard.press('Escape');
+  await window.locator('#source-tab').click();
+  await window.locator('#reader').evaluate((reader) => { reader.scrollTop = 600; });
+  await setAppearance(window, { mode: 'light', light: 'solarized-light' });
+  await expect(window.locator('#source')).toBeVisible();
+  await expect(window.locator('#source-tab')).toHaveAttribute('aria-pressed', 'true');
+  expect(await window.locator('#reader').evaluate((reader) => reader.scrollTop)).toBe(600);
+  await expect(window.locator('#search-count')).toHaveText('2 / 2');
+  await window.keyboard.press('Escape');
+  await window.locator('#preview-tab').click();
   await writeFile(file, longSource + 'External save with search open.\n');
   await expect(window.locator('#source')).toContainText('External save with search open.');
   expect(await window.locator('#reader').evaluate((reader) => reader.scrollTop)).toBe(1000);
@@ -135,6 +151,8 @@ try {
   });
   await expect(window.locator('#document-title')).toHaveText('Links');
   await expect(window.locator('#error')).toBeHidden();
+  await checkHighlighting(window, directory, executablePath ? 'packaged' : 'desktop');
+  await checkImages(window, directory, executablePath ? 'packaged' : 'desktop');
   // Exercise the same picker path used by the Open button without a native dialog.
   await app.evaluate(({ dialog }, welcome) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [welcome] }); }, path.resolve('examples/welcome.org'));
   await window.locator('#open').click();
@@ -168,13 +186,40 @@ try {
   }
   await mkdir('test-results', { recursive: true });
   const screenshotPrefix = executablePath ? 'packaged' : 'desktop';
-  await window.screenshot({ path: `test-results/${screenshotPrefix}-light.png` });
-  await window.locator('#theme').selectOption('dark');
-  await window.screenshot({ path: `test-results/${screenshotPrefix}-dark.png` });
-  await window.locator('#theme').selectOption('system');
+  await captureAppearances(window, screenshotPrefix);
+  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(720, 500));
+  await setAppearance(window, { mode: 'light' });
+  await expect.poll(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getSize()[0])).toBe(720);
+  // Window decorations can consume part of the outer width on Linux.
+  for (const mode of ['light', 'dark']) {
+    await setAppearance(window, { mode });
+    // Native resize and popover toggle events settle asynchronously in the renderer.
+    await expect.poll(() => window.locator('#appearance-panel').evaluate((panel) => {
+      const bounds = panel.getBoundingClientRect();
+      return bounds.left >= 12 && bounds.right <= innerWidth - 12 && bounds.bottom <= innerHeight;
+    })).toBe(true);
+    expect(await window.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await window.screenshot({ path: `test-results/${screenshotPrefix}-solarized-${mode}-narrow.png` });
+  }
+  await setAppearance(window, { mode: 'system' });
+  await app.close();
+  app = await electron.launch({ executablePath, args: [...appArgs, file, profileArg, ...process.argv.slice(2)], env, chromiumSandbox: true });
+  app.process().stderr.on('data', (chunk) => { stderr += chunk; });
+  window = await app.firstWindow();
+  window.on('pageerror', (error) => errors.push(error.message));
+  await expect(window.locator('#document-title')).toHaveText('Old file must stay detached');
+  await expect(window.locator('#appearance-mode')).toHaveValue('system');
+  await expect(window.locator('#light-theme')).toHaveValue('solarized-light');
+  await expect(window.locator('#dark-theme')).toHaveValue('solarized-dark');
+  await expect(window.locator('#sans-serif-headings')).toBeChecked();
+  await expect(window.locator('#document-title')).toHaveCSS('font-family', /sans-serif/);
+  await window.emulateMedia({ colorScheme: 'light' });
+  await expect(window.locator('html')).toHaveAttribute('data-theme', 'solarized-light');
+  await window.emulateMedia({ colorScheme: 'dark' });
+  await expect(window.locator('html')).toHaveAttribute('data-theme', 'solarized-dark');
   expect(errors).toEqual([]);
   expect(stderr).not.toContain('not compatible with Vulkan');
-  console.log(`Desktop smoke passed (${executablePath ? 'packaged' : 'development'}): open, file-backed drops, Unicode paths, input errors, CLI handoff${process.platform === 'darwin' ? ', macOS window reopening' : ''}, render, source, themes, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, large documents, sandbox, HTML safety, and no Vulkan compatibility warning.`);
+  console.log(`Desktop smoke passed (${executablePath ? 'packaged' : 'development'}): open, file-backed drops, Unicode paths, input errors, CLI handoff${process.platform === 'darwin' ? ', macOS window reopening' : ''}, render, source, themes, syntax highlighting, local images, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, large documents, sandbox, HTML safety, and no Vulkan compatibility warning.`);
 } finally {
   await app?.close();
   await rm(directory, { recursive: true, force: true });

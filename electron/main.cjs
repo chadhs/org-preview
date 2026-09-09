@@ -4,8 +4,9 @@ const { pathToFileURL } = require('node:url');
 const { readDocument, watchDocument } = require('./documents.cjs');
 const { documentArgument } = require('./arguments.cjs');
 const { configureGraphics } = require('./graphics.cjs');
+const { createImageReader } = require('./images.cjs');
 configureGraphics(app.commandLine);
-let win, current, stopWatching;
+let win, current, stopWatching, imageReader;
 let openRevision = 0;
 let pendingPath = documentArgument(process.argv, app.isPackaged);
 const iconPath = app.isPackaged ? path.join(process.resourcesPath, 'icon.png') : path.join(__dirname, '../build/icons/256x256.png');
@@ -20,6 +21,7 @@ async function openDocument(filePath) {
   current = doc;
   const publish = (next) => {
     current = next;
+    imageReader = createImageReader(next);
     win?.setTitle(`${next.name} — Org Preview`);
     win?.webContents.send('document:changed', next);
   };
@@ -53,7 +55,7 @@ function createWindow() {
   win = new BrowserWindow({ width: 1240, height: 850, minWidth: 720, minHeight: 500, backgroundColor: '#f8f7f3', title: 'Org Preview', icon: iconPath, webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true } });
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   win.webContents.on('will-navigate', (event) => event.preventDefault());
-  win.on('closed', () => { openRevision++; stopWatching?.(); win = undefined; current = undefined; });
+  win.on('closed', () => { openRevision++; stopWatching?.(); win = undefined; current = undefined; imageReader = undefined; });
   win.loadFile(path.join(__dirname, '../dist/index.html'));
 }
 const locked = app.requestSingleInstanceLock();
@@ -81,6 +83,12 @@ else {
       return openDocument(filePath);
     });
     handle('document:reveal', () => { if (current) shell.showItemInFolder(current.path); });
+    handle('image:read', async (documentPath, reference) => {
+      const reader = imageReader;
+      if (!reader || documentPath !== current?.path) return { error: 'The document changed.' };
+      const result = await reader(reference);
+      return reader === imageReader ? result : { error: 'The document changed.' };
+    });
     handle('link:external', async (value) => {
       if (typeof value !== 'string' || value.length > 8192) throw new Error('Invalid link.');
       const url = new URL(value);
