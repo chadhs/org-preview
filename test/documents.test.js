@@ -17,7 +17,19 @@ test('reads Org files and rejects invalid types, directories and oversized input
     await mkdir(path.join(dir, 'folder.org'));
     await assert.rejects(readDocument(path.join(dir, 'folder.org')), /directory/);
     await writeFile(file, Buffer.alloc(MAX_BYTES + 1));
-    await assert.rejects(readDocument(file), /up to 4 MB/);
+    await assert.rejects(readDocument(file), /up to 16 MiB/);
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+test('reads the full 16 MiB limit, including UTF-8 characters across read chunks', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'org-preview-large-'));
+  try {
+    const file = path.join(dir, 'large.org');
+    const source = 'a'.repeat(65535) + '日本語' + 'b'.repeat(MAX_BYTES - 65535 - 9);
+    await writeFile(file, source);
+    const doc = await readDocument(file);
+    assert.equal(doc.size, MAX_BYTES);
+    assert.equal(doc.source, source);
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
 

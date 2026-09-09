@@ -55,7 +55,8 @@ async function acceptDocument(doc) {
     $('#content').innerHTML = DOMPurify.sanitize(parsed.html, { USE_PROFILES: { html: true }, FORBID_TAGS: ['style', 'img', 'video', 'audio', 'iframe', 'form'], FORBID_ATTR: ['style'] });
     $('#source').textContent = doc.source;
     $('#heading-count').textContent = parsed.outline.length;
-    $('#outline').replaceChildren(...parsed.outline.map((heading) => {
+    const outline = document.createDocumentFragment();
+    for (const heading of parsed.outline) {
       const button = document.createElement('button');
       button.className = 'outline-item';
       button.style.paddingLeft = `${16 + Math.min(heading.level - 1, 5) * 14}px`;
@@ -67,8 +68,9 @@ async function acceptDocument(doc) {
       label.textContent = heading.label || 'Untitled heading';
       button.append(marker, label);
       button.addEventListener('click', () => goTo(heading.id));
-      return button;
-    }));
+      outline.append(button);
+    }
+    $('#outline').replaceChildren(outline);
     if (!parsed.outline.length) $('#outline').textContent = 'No headings in this file.';
     $('#stats').textContent = `${parsed.words.toLocaleString()} words  ·  ${parsed.lines.toLocaleString()} lines`;
     $('#status').replaceChildren();
