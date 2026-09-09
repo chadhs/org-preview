@@ -90,6 +90,9 @@ th { font-weight: 550; background: var(--inset); }
 th, td { padding: 10px 14px; border-bottom: 1px solid var(--line); }
 tr:last-child td { border-bottom: 0; }
 .unresolved { color: var(--muted); text-decoration: underline dotted; text-underline-offset: 4px; }
+.image-preview { display: inline-block; max-width: 100%; margin: 8px 0; vertical-align: middle; }
+.image-preview img { display: block; max-width: 100%; height: auto; border-radius: 5px; }
+.image-placeholder { display: inline-block; max-width: 100%; padding: 10px 14px; border: 1px dashed var(--line-strong); border-radius: 5px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
 .document-end { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 10px; margin-top: 60px; border-top: 1px solid var(--line); padding-top: 20px; }
 .document-end span:first-child { color: var(--accent); font-size: 24px; font-family: Georgia, serif; padding-top: 8px; }
 #source { padding: 36px 48px; font-size: 13px; color: var(--ink); line-height: 1.8; tab-size: 2; }

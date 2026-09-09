@@ -1,5 +1,6 @@
 import { parse } from 'orga';
 import { createCodeHighlighter } from './highlight.js';
+import { localImageTarget, MAX_IMAGE_LINKS } from '../electron/image-links.mjs';
 
 export const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const ignored = new Set(['stars', 'opening', 'closing', 'link.path', 'list.item.bullet', 'emptyLine', 'table.columnSeparator', 'table.hr']);
@@ -9,6 +10,7 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
   const tree = parse(source);
   const highlightCode = createCodeHighlighter();
   const outline = [];
+  const images = [];
   const used = new Set();
   const raw = (node) => source.slice(node.position?.start.offset, node.position?.end.offset);
   const text = (node) => node.type === 'text' ? node.value : (node.children || []).map(text).join('');
@@ -50,6 +52,13 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
       case 'tags': return `<span class="tags">${node.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</span>`;
       case 'link': {
         const pathValue = node.path?.value || '';
+        const reference = raw(node);
+        if (node.path?.protocol === 'file' && localImageTarget(reference)) {
+          if (images.length >= MAX_IMAGE_LINKS) return `<span class="image-placeholder">Image limit reached: ${escapeHtml(pathValue)}</span>`;
+          const id = images.length;
+          images.push({ id, reference, start: node.position.start.offset, end: node.position.end.offset, label: pathValue });
+          return `<span class="image-preview" data-image-id="${id}"><span class="image-placeholder">Loading image: ${escapeHtml(pathValue)}</span></span>`;
+        }
         // Orga separates mailto from its address, unlike HTTP URLs.
         const value = node.path?.protocol === 'mailto' ? `mailto:${pathValue}` : pathValue;
         const label = children(node) || escapeHtml(value);
@@ -100,7 +109,7 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
     }
   }
   return {
-    html: render(tree), outline,
+    html: render(tree), outline, images,
     title: String(tree.properties.title || fallbackTitle),
     subtitle: String(tree.properties.subtitle || ''),
     author: String(tree.properties.author || ''),

@@ -44,6 +44,22 @@ plain text. Blocks over 50,000 characters stay plain text, with a total
 highlighting budget of 200,000 characters per document to limit rendering work.
 The read-only Org source view stays plain text. Code never executes.
 
+* Local images
+Image links without descriptions display inline, for example
+=[[file:images/chart.png]]= or =[[./photo.jpg]]=.
+PNG, JPEG, GIF, WebP, and SVG files are supported. Relative paths resolve
+from the Org file's folder; absolute paths and =~/= paths also work.
+Images fit the reading column without being stretched beyond their size.
+
+Missing, unreadable, or invalid images show a placeholder while the document
+remains readable. Images reload when you save or reopen the Org file.
+Image-only changes are not watched separately. Web images remain links,
+and links with descriptions remain text, following Org's inline-image convention.
+
+Previews are limited to 100 image links, 8 MiB per image, and 32 MiB of unique
+image data per document. SVGs display in an image context, without executing
+scripts or loading external resources. Embedded HTML remains inert.
+
 * Install
 You do not need Node.js, npm, or Emacs to use a downloaded release.
 Supported downloads are macOS Apple Silicon and Linux x86_64, including
@@ -363,7 +379,7 @@ Emacs's exporter. Custom TODO workflows, footnotes, inline math, timestamps,
 macros, export options, and complex Org constructs may display literally or
 incompletely. Source view always shows the original file.
 
-Local images and links to other files are not opened in this prototype.
+Local image links display inline. Links to other local files are not opened.
 Raw export blocks display as text. Babel, includes, embedded HTML, and
 custom URL handlers never execute. Documents cannot fetch network resources.
 Clicking a web link opens your browser. No telemetry or cloud services.

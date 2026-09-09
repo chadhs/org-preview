@@ -4,6 +4,7 @@ import { renderOrg } from './org.js';
 import './style.css';
 import { createSearch } from './search.js';
 import { initializeAppearance } from './appearance.js';
+import { loadImages } from './images.js';
 
 initializeAppearance();
 
@@ -93,6 +94,9 @@ async function acceptDocument(doc) {
       });
     }, { root: $('#reader'), rootMargin: '-5% 0px -65% 0px' });
     $$('#content [data-level]').forEach((heading) => observer.observe(heading));
+    void loadImages($('#content'), parsed.images, doc.path, api.image, () => revision === renderRevision, () => {
+      if ($('#search').value) finder.search($('#search').value, true, true, false);
+    });
   } catch (reason) { error(`Could not render this file: ${reason.message}`); }
 }
 const $$ = (selector) => [...document.querySelectorAll(selector)];
