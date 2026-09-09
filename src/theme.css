@@ -21,3 +21,17 @@
   --search-wash: #586e75; --search-ink: #fdf6e3;
   --search-active-wash: #b58900; --search-active-ink: #002b36;
 }
+
+/* Syntax colors share the active document palette. */
+:root {
+  --syntax-comment: var(--muted); --syntax-keyword: #7d5084; --syntax-string: #52705b;
+  --syntax-number: #986032; --syntax-title: #326d86; --syntax-variable: #8f4735; --syntax-meta: #766827;
+}
+:root[data-theme='dark'] {
+  --syntax-keyword: #c7a1cd; --syntax-string: #9abc91; --syntax-number: #e2af77;
+  --syntax-title: #8fbed2; --syntax-variable: #dfa383; --syntax-meta: #d2c481;
+}
+:root[data-theme='solarized-light'], :root[data-theme='solarized-dark'] {
+  --syntax-keyword: #859900; --syntax-string: #2aa198; --syntax-number: #d33682;
+  --syntax-title: #268bd2; --syntax-variable: #cb4b16; --syntax-meta: #b58900;
+}

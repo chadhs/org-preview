@@ -30,6 +30,20 @@ Enable *Sans-serif headings* to use the app's sans-serif font for the document
 title and headings. This preference applies to every theme and saves immediately.
 It starts off, preserving the original heading fonts.
 
+* Syntax highlighting
+Preview source blocks use their declared language, such as =#+begin_src python=.
+Highlighting works offline and follows the selected color theme.
+
+Bundled languages include Bash, C, C++, CSS, diff, Go, INI/TOML, Java,
+JavaScript, JSON, Lisp, Lua, Markdown, Nix, Python, Ruby, Rust, SQL,
+TypeScript, XML/HTML, and YAML. Common aliases such as =js=, =ts=, =sh=,
+and =yml= work too. =emacs-lisp= and =elisp= use the generic Lisp grammar.
+
+Unknown or missing languages, example/export blocks, and inline code stay
+plain text. Blocks over 50,000 characters stay plain text, with a total
+highlighting budget of 200,000 characters per document to limit rendering work.
+The read-only Org source view stays plain text. Code never executes.
+
 * Install
 You do not need Node.js, npm, or Emacs to use a downloaded release.
 Supported downloads are macOS Apple Silicon and Linux x86_64, including

@@ -5,6 +5,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { checkAppearance, setAppearance, captureAppearances } from './lib/appearance-smoke.mjs';
+import { checkHighlighting } from './lib/highlight-smoke.mjs';
 
 const directory = await mkdtemp(path.join(tmpdir(), 'org-preview-smoke-'));
 const file = path.join(directory, 'smoke café 日本語.org');
@@ -123,6 +124,7 @@ try {
   });
   await expect(window.locator('#document-title')).toHaveText('Links');
   await expect(window.locator('#error')).toBeHidden();
+  await checkHighlighting(window, directory, executablePath ? 'packaged' : 'desktop');
   // Exercise the same picker path used by the Open button without a native dialog.
   await app.evaluate(({ dialog }, welcome) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [welcome] }); }, path.resolve('examples/welcome.org'));
   await window.locator('#open').click();
@@ -187,7 +189,7 @@ try {
   await window.emulateMedia({ colorScheme: 'dark' });
   await expect(window.locator('html')).toHaveAttribute('data-theme', 'solarized-dark');
   expect(errors).toEqual([]);
-  console.log(`Desktop smoke passed (${executablePath ? 'packaged' : 'development'}): open, file-backed drops, Unicode paths, input errors, CLI handoff${process.platform === 'darwin' ? ', macOS window reopening' : ''}, render, source, themes, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, sandbox, and HTML safety.`);
+  console.log(`Desktop smoke passed (${executablePath ? 'packaged' : 'development'}): open, file-backed drops, Unicode paths, input errors, CLI handoff${process.platform === 'darwin' ? ', macOS window reopening' : ''}, render, source, themes, syntax highlighting, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, sandbox, and HTML safety.`);
 } finally {
   await app?.close();
   await rm(directory, { recursive: true, force: true });

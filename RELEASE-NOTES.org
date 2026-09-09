@@ -6,7 +6,7 @@ pass. The first version is =0.1.0=, followed by =0.2.0=, =0.3.0=, and so on.
 The GitHub release page contains the exact version, changes, downloads,
 and checksums. Pull requests do not publish releases.
 
-* Theme preferences for v0.5.0
+* Appearance and syntax highlighting for v0.5.0
 - Add Solarized Light and Solarized Dark across the reader and app controls.
 - Name the original themes Default Light and Default Dark, preserving their colors.
 - Replace the theme dropdown with an Appearance panel containing mode and
@@ -16,6 +16,10 @@ and checksums. Pull requests do not publish releases.
 - Save preferences immediately and preserve existing appearance settings.
 - Add an optional Sans-serif headings preference for document titles and headings
   across all themes, with the original heading fonts kept by default.
+- Highlight preview source blocks using their declared language and the active
+  theme's syntax colors. Bundle language support locally, with plain-text
+  fallback for unsupported languages and large blocks. The Org source view
+  remains plain text.
 
 * A live reader for Org files
 Org Preview opens local =.org= files and refreshes the document when you

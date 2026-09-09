@@ -1,4 +1,5 @@
 import { parse } from 'orga';
+import { createCodeHighlighter } from './highlight.js';
 
 export const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const ignored = new Set(['stars', 'opening', 'closing', 'link.path', 'list.item.bullet', 'emptyLine', 'table.columnSeparator', 'table.hr']);
@@ -6,6 +7,7 @@ const styles = { bold: 'strong', italic: 'em', underline: 'u', strikeThrough: 's
 
 export function renderOrg(source, fallbackTitle = 'Untitled') {
   const tree = parse(source);
+  const highlightCode = createCodeHighlighter();
   const outline = [];
   const used = new Set();
   const raw = (node) => source.slice(node.position?.start.offset, node.position?.end.offset);
@@ -84,8 +86,11 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
       }
       case 'block': {
         if (node.name.toLowerCase() === 'quote') return `<blockquote>${children(node)}</blockquote>`;
-        const label = node.name.toLowerCase() === 'src' ? node.params?.[0] || 'source' : node.name;
-        return `<figure class="code-block"><figcaption>${escapeHtml(label)}</figcaption><pre><code>${escapeHtml(node.value)}</code></pre></figure>`;
+        const sourceBlock = node.name.toLowerCase() === 'src';
+        const language = sourceBlock ? node.params?.[0] || '' : '';
+        const label = sourceBlock ? language || 'source' : node.name;
+        const highlighted = sourceBlock ? highlightCode(node.value, language) : null;
+        return `<figure class="code-block"><figcaption>${escapeHtml(label)}</figcaption><pre><code>${highlighted ?? escapeHtml(node.value)}</code></pre></figure>`;
       }
       case 'planning': return `<p class="planning">${escapeHtml(raw(node))}</p>`;
       case 'drawer': return `<details class="drawer"><summary>${escapeHtml(node.name.toLowerCase())}</summary><pre>${escapeHtml(node.value.trim())}</pre></details>`;
