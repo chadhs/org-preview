@@ -1,6 +1,6 @@
 {
   "name": "org-preview",
-  "version": "0.1.0",
+  "version": "0.6.0",
   "description": "A live Org-mode file previewer for macOS and Linux",
   "author": "Chad Stovern",
   "license": "BSD-3-Clause",
