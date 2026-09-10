@@ -45,5 +45,11 @@ export function createSearch(root, scroller, report) {
     }
     report(`${active + 1} / ${ranges.length}${ranges.length === 1000 ? '+' : ''}`);
   }
-  return { search, clear };
+  return { search, clear, snapshot: () => ({ query, active }), restore(state) {
+    clear();
+    if (!state?.query) return;
+    search(state.query, true, true, false);
+    active = Math.max(0, Math.min(state.active ?? 0, ranges.length - 1));
+    search(state.query, true, true, false);
+  } };
 }

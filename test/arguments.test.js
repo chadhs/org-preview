@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { documentArgument } from '../electron/arguments.cjs';
+import { documentArgument, documentArguments } from '../electron/arguments.cjs';
 
 test('development and packaged command lines keep Unicode and unsupported paths', () => {
   for (const file of ['notes café 日本語.org', 'unsupported.txt', 'large.org']) {
@@ -27,4 +27,9 @@ test('second-instance Chromium flag reordering does not turn the app path into a
   assert.equal(documentArgument(['electron', ...flags, '.', 'file:///tmp/notes%20caf%C3%A9.org'], false), '/tmp/notes café.org');
   assert.equal(documentArgument(['electron', ...flags, '/source/org-preview', 'notes.org'], false), 'notes.org');
   assert.equal(documentArgument(['org-preview', ...flags, 'notes.org'], true), 'notes.org');
+});
+
+test('multi-file invocations preserve order, Unicode URLs and explicit dash-prefixed paths', () => {
+  assert.deepEqual(documentArguments(['electron', '--user-data-dir=/tmp/profile', '.', 'a.org', 'file:///tmp/b%20c.org', '--ozone-platform=x11'], false), ['a.org', '/tmp/b c.org']);
+  assert.deepEqual(documentArguments(['org-preview', '--', '-a.org', 'b.org'], true), ['-a.org', 'b.org']);
 });

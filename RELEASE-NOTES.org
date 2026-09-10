@@ -6,6 +6,22 @@ pass. The first version is =0.1.0=, followed by =0.2.0=, =0.3.0=, and so on.
 The GitHub release page contains the exact version, changes, downloads,
 and checksums. Pull requests do not publish releases.
 
+* Document tabs, Mermaid, and a compact title bar for v0.6.0
+- Combine the window title bar and reading controls into a compact themed row,
+  preserving native window buttons and a full-width tab strip.
+- Open multiple documents in tabs through the picker, drag and drop, Finder,
+  or CLI paths. Duplicate opens select the existing tab. Every tab keeps its
+  search, selected match, preview/source mode, and scroll positions.
+- Watch background documents without changing the active preview. Close tabs
+  with their close buttons or Cmd/Ctrl+W; switch with Ctrl+Tab and
+  Ctrl+Shift+Tab. The final tab closes to an empty reader with an Open action.
+- Render Mermaid source blocks offline with the current appearance theme and
+  a Show source disclosure. Invalid or oversized diagrams keep readable source.
+  Avoid duplicating an adjacent, matching Babel-generated image result.
+- Isolate diagram layout in a sandboxed renderer with a five-second timeout.
+  Keep document callbacks, network access, arbitrary HTML, and Babel execution
+  disabled. Bound open-document memory and diagram input/output sizes.
+
 * Appearance, syntax highlighting, and local images for v0.5.0
 - Add Solarized Light and Solarized Dark across the reader and app controls.
 - Name the original themes Default Light and Default Dark, preserving their colors.
@@ -77,11 +93,12 @@ Linux test platform, with both Wayland and XWayland verified. There is no
 AUR or pacman package yet.
 
 * Known limits
-- One document at a time, UTF-8, up to 16 MiB.
+- Up to 20 UTF-8 documents, 16 MiB per file and 64 MiB of source files total.
+  Tabs do not persist after quitting.
 - This is a reader. Keep editing in your existing editor.
 - Org rendering covers the documented subset, not full Emacs export parity.
-- Links to other local files, math, diagrams, Babel, remote
-  includes, agenda features, Quick Look, and automatic updates are excluded.
+- Links to other local files, math, diagram engines other than Mermaid, Babel,
+  remote includes, agenda features, Quick Look, and automatic updates are excluded.
 - Direct FUSE-mounted AppImage launch was not tested on the Omarchy machine,
   which lacks FUSE 2. Extract-and-run and tar execution passed.
 - Intel macOS and other architectures have no verified binaries in this release.

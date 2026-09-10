@@ -4,8 +4,10 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { checkTitlebar } from './lib/titlebar-smoke.mjs';
 import { checkAppearance, setAppearance, captureAppearances } from './lib/appearance-smoke.mjs';
 import { checkHighlighting } from './lib/highlight-smoke.mjs';
+import { checkTabsAndDiagrams } from './lib/tabs-diagrams-smoke.mjs';
 import { checkImages } from './lib/images-smoke.mjs';
 
 const directory = await mkdtemp(path.join(tmpdir(), 'org-preview-smoke-'));
@@ -24,7 +26,7 @@ try {
   app.process().stderr.on('data', (chunk) => { stderr += chunk; });
   let window = await app.firstWindow();
   expect(app.process().spawnargs).not.toContain('--no-sandbox');
-  expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences().sandbox)).toBe(true);
+  expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find((win) => win.webContents.getURL().endsWith('/index.html')).webContents.getLastWebPreferences().sandbox)).toBe(true);
   const errors = [];
   window.on('pageerror', (error) => errors.push(error.message));
   await expect(window.locator('#document-title')).toHaveText('Desktop smoke test');
@@ -39,6 +41,7 @@ try {
   await expect(window.locator('#source')).toContainText('#+title: Desktop smoke test');
   await window.locator('#preview-tab').click();
   await checkAppearance(window);
+  await checkTitlebar(app, window, executablePath ? 'packaged' : 'desktop');
   await window.locator('#find-button').click();
   await window.locator('#search').fill('Read');
   await expect(window.locator('#search-count')).toContainText('/ 1');
@@ -153,6 +156,7 @@ try {
   await expect(window.locator('#error')).toBeHidden();
   await checkHighlighting(window, directory, executablePath ? 'packaged' : 'desktop');
   await checkImages(window, directory, executablePath ? 'packaged' : 'desktop');
+  await checkTabsAndDiagrams(app, window, directory, executablePath ? 'packaged' : 'desktop');
   // Exercise the same picker path used by the Open button without a native dialog.
   await app.evaluate(({ dialog }, welcome) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [welcome] }); }, path.resolve('examples/welcome.org'));
   await window.locator('#open').click();
@@ -164,7 +168,7 @@ try {
     // macOS keeps the application alive after its last window closes. A Finder
     // open-file event must create a window without waiting for an activate event.
     await app.evaluate(({ BrowserWindow }) => new Promise((resolve) => {
-      const closing = BrowserWindow.getAllWindows()[0];
+      const closing = BrowserWindow.getAllWindows().find((win) => win.webContents.getURL().endsWith('/index.html'));
       closing.once('closed', resolve);
       closing.close();
     }));
@@ -175,7 +179,7 @@ try {
     await expect(window.locator('#document-title')).toHaveText('Old file must stay detached');
     // Open remains usable from the native menu with no windows, too.
     await app.evaluate(({ BrowserWindow }) => new Promise((resolve) => {
-      const closing = BrowserWindow.getAllWindows()[0];
+      const closing = BrowserWindow.getAllWindows().find((win) => win.webContents.getURL().endsWith('/index.html'));
       closing.once('closed', resolve);
       closing.close();
     }));
@@ -187,9 +191,9 @@ try {
   await mkdir('test-results', { recursive: true });
   const screenshotPrefix = executablePath ? 'packaged' : 'desktop';
   await captureAppearances(window, screenshotPrefix);
-  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(720, 500));
+  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find((win) => win.webContents.getURL().endsWith('/index.html')).setSize(720, 500));
   await setAppearance(window, { mode: 'light' });
-  await expect.poll(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].getSize()[0])).toBe(720);
+  await expect.poll(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find((win) => win.webContents.getURL().endsWith('/index.html')).getSize()[0])).toBe(720);
   // Window decorations can consume part of the outer width on Linux.
   for (const mode of ['light', 'dark']) {
     await setAppearance(window, { mode });
@@ -203,10 +207,13 @@ try {
   }
   await setAppearance(window, { mode: 'system' });
   await app.close();
-  app = await electron.launch({ executablePath, args: [...appArgs, file, profileArg, ...process.argv.slice(2)], env, chromiumSandbox: true });
+  app = await electron.launch({ executablePath, args: [...appArgs, file, path.join(directory, 'links.org'), profileArg, ...process.argv.slice(2)], env, chromiumSandbox: true });
   app.process().stderr.on('data', (chunk) => { stderr += chunk; });
   window = await app.firstWindow();
   window.on('pageerror', (error) => errors.push(error.message));
+  await expect(window.locator('#document-title')).toHaveText('Links');
+  await expect(window.locator('#document-tabs [role=tab]')).toHaveCount(2);
+  await window.evaluate((file) => window.orgPreview.openPath(file), file);
   await expect(window.locator('#document-title')).toHaveText('Old file must stay detached');
   await expect(window.locator('#appearance-mode')).toHaveValue('system');
   await expect(window.locator('#light-theme')).toHaveValue('solarized-light');
@@ -219,7 +226,7 @@ try {
   await expect(window.locator('html')).toHaveAttribute('data-theme', 'solarized-dark');
   expect(errors).toEqual([]);
   expect(stderr).not.toContain('not compatible with Vulkan');
-  console.log(`Desktop smoke passed (${executablePath ? 'packaged' : 'development'}): open, file-backed drops, Unicode paths, input errors, CLI handoff${process.platform === 'darwin' ? ', macOS window reopening' : ''}, render, source, themes, syntax highlighting, local images, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, large documents, sandbox, HTML safety, and no Vulkan compatibility warning.`);
+  console.log(`Desktop smoke passed (${executablePath ? 'packaged' : 'development'}): open, file-backed drops, Unicode paths, input errors, CLI handoff${process.platform === 'darwin' ? ', macOS window reopening' : ''}, render, source, themes, syntax highlighting, local images, tabs, Mermaid, search, scroll preservation, external saves, atomic replacement, delete/recreate, watcher switching, large documents, sandbox, HTML safety, and no Vulkan compatibility warning.`);
 } finally {
   await app?.close();
   await rm(directory, { recursive: true, force: true });
