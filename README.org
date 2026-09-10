@@ -3,14 +3,24 @@
 
 [[file:build/icons/128x128.png]]
 
+Org Preview is a live reader for local =.org= files on macOS and Linux.
+Keep writing in your editor; previews update when you save.
+
+- *Document tabs* keep several notebooks open, with separate search, scroll
+  positions, and live updates for each file.
+- *Mermaid diagrams* render directly from Org source blocks, entirely offline,
+  with a Show source disclosure and support for the selected theme.
+
 [[#install][Install on macOS or Omarchy]]
 
 * Screenshots
-Light preview with the document outline:
+v0.6.0 in Default Light: multiple document tabs, the compact toolbar, and Org
+tasks and tables.
 
 [[file:docs/screenshots/preview-light.png]]
 
-Dark preview showing Org tables and source blocks:
+v0.6.0 in Solarized Dark: a Mermaid flowchart rendered from an Org source
+block, with the diagram source expanded below it.
 
 [[file:docs/screenshots/preview-dark.png]]
 
