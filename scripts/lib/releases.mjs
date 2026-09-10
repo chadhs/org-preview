@@ -91,7 +91,7 @@ export function releaseNotes({ version, repository, source, changes = '' }) {
   return [
     'Org Preview is a live reader for local Org-mode files. Keep writing in your editor and the preview follows your saves. Downloaded releases need no Node.js, npm, or Emacs.',
     '',
-    'Includes an outline, search, source view, themes, zoom, and common Org formatting. Documents stay local; embedded HTML and Babel blocks never execute. BSD-3-Clause, with the MIT-licensed Orga parser.',
+    'Includes document tabs, offline Mermaid diagrams, local images, an outline, search, source view, themes, zoom, and common Org formatting. Documents stay local; embedded HTML and Babel blocks never execute. BSD-3-Clause, with the MIT-licensed Orga parser.',
     '',
     '### macOS: Apple Silicon',
     '',
@@ -123,7 +123,7 @@ export function releaseNotes({ version, repository, source, changes = '' }) {
     '',
     '### Known limits',
     '',
-    'One UTF-8 document at a time, up to 16 MiB. Editing, full Emacs export parity, local image/file links, math/diagrams, Babel, Quick Look, Developer ID signing/notarization, and auto-updates remain outside scope. Intel Mac builds are not supplied.',
+    'Up to 20 UTF-8 documents, 16 MiB per file and 64 MiB of source files total. Tabs do not persist after quitting. Mermaid rendering has input, output, and time limits; document configuration and remote assets are unsupported. Editing, full Emacs export parity, links to other local files, math, other diagram engines, Babel, Quick Look, Developer ID signing/notarization, and auto-updates remain outside scope. Intel Mac builds are not supplied.',
     '',
     `[Release information](https://github.com/${repository}/blob/v${version}/RELEASE-NOTES.org) · [Merged source](https://github.com/${repository}/commit/${source})`,
     '',

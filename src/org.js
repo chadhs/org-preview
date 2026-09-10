@@ -11,6 +11,9 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
   const highlightCode = createCodeHighlighter();
   const outline = [];
   const images = [];
+  const diagrams = [];
+  const diagramNodes = new WeakMap();
+  let diagramCharacters = 0;
   const used = new Set();
   const raw = (node) => source.slice(node.position?.start.offset, node.position?.end.offset);
   const text = (node) => node.type === 'text' ? node.value : (node.children || []).map(text).join('');
@@ -28,6 +31,29 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
         ids.set(heading, id);
         outline.push({ id, label, level: heading.level, todo: heading.keyword || '' });
       }
+    }
+    const siblings = node.children || [];
+    for (let i = 0; i < siblings.length; i++) {
+      const block = siblings[i];
+      if (block.type !== 'block' || block.name.toLowerCase() !== 'src' || block.params?.[0]?.toLowerCase() !== 'mermaid') continue;
+      const error = diagrams.length >= 20 ? 'Diagram limit reached: 20 per document.'
+        : block.value.length > 20000 ? 'Diagram exceeds 20,000 characters.'
+        : diagramCharacters + block.value.length > 100000 ? 'Diagram source exceeds 100,000 characters per document.' : '';
+      if (error) { diagramNodes.set(block, { error }); continue; }
+      diagramCharacters += block.value.length;
+      const diagram = { id: diagrams.length, start: block.position.start.offset, end: block.position.end.offset };
+      const following = siblings.slice(i + 1).filter((child) => !['emptyLine', 'newline'].includes(child.type));
+      const [result, link] = following;
+      if (result?.type === 'keyword' && result.key.toLowerCase() === 'results'
+        && (result.value || '') === (block.attributes?.name || '')
+        && link?.type === 'link' && localImageTarget(raw(link))
+        && !source.slice(block.position.end.offset, result.position.start.offset).trim()
+        && !source.slice(result.position.end.offset, link.position.start.offset).trim()
+        && /^[ \t]*(?:\r?\n[ \t]*(?:\r?\n|$)|$)/.test(source.slice(link.position.end.offset))) {
+        diagram.resultStart = link.position.start.offset;
+      }
+      diagrams.push(diagram);
+      diagramNodes.set(block, diagram);
     }
     (node.children || []).forEach(index);
   }
@@ -57,7 +83,7 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
           if (images.length >= MAX_IMAGE_LINKS) return `<span class="image-placeholder">Image limit reached: ${escapeHtml(pathValue)}</span>`;
           const id = images.length;
           images.push({ id, reference, start: node.position.start.offset, end: node.position.end.offset, label: pathValue });
-          return `<span class="image-preview" data-image-id="${id}"><span class="image-placeholder">Loading image: ${escapeHtml(pathValue)}</span></span>`;
+          return `<span class="image-preview" data-image-id="${id}" data-image-start="${node.position.start.offset}"><span class="image-placeholder">Loading image: ${escapeHtml(pathValue)}</span></span>`;
         }
         // Orga separates mailto from its address, unlike HTTP URLs.
         const value = node.path?.protocol === 'mailto' ? `mailto:${pathValue}` : pathValue;
@@ -95,6 +121,11 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
       }
       case 'block': {
         if (node.name.toLowerCase() === 'quote') return `<blockquote>${children(node)}</blockquote>`;
+        const diagram = diagramNodes.get(node);
+        if (diagram) {
+          if (diagram.error) return `<figure class="code-block"><figcaption>mermaid · ${escapeHtml(diagram.error)}</figcaption><pre><code>${escapeHtml(node.value)}</code></pre></figure>`;
+          return `<figure class="code-block diagram" data-diagram-id="${diagram.id}"><figcaption>mermaid</figcaption><div class="diagram-output" role="status">Rendering diagram…</div><details open><summary>Show source</summary><pre><code>${escapeHtml(node.value)}</code></pre></details></figure>`;
+        }
         const sourceBlock = node.name.toLowerCase() === 'src';
         const language = sourceBlock ? node.params?.[0] || '' : '';
         const label = sourceBlock ? language || 'source' : node.name;
@@ -109,7 +140,7 @@ export function renderOrg(source, fallbackTitle = 'Untitled') {
     }
   }
   return {
-    html: render(tree), outline, images,
+    html: render(tree), outline, images, diagrams,
     title: String(tree.properties.title || fallbackTitle),
     subtitle: String(tree.properties.subtitle || ''),
     author: String(tree.properties.author || ''),

@@ -38,7 +38,7 @@ or switch to Source to read the original file.
 | Plain text     | A file you can keep    |
 
 * Code stays code
-Source blocks are displayed as text. They never run.
+Programming-language source blocks display as text. Babel code never runs.
 
 #+begin_src emacs-lisp
 (defun a-little-room-to-think ()
@@ -47,14 +47,26 @@ Source blocks are displayed as text. They never run.
   (org-mode))
 #+end_src
 
+* A diagram in plain text
+Mermaid blocks render offline and follow your appearance theme. Expand
+*Show source* to see how this flowchart is written.
+
+#+begin_src mermaid
+flowchart LR
+  Write --> Save
+  Save --> Preview
+  Preview --> Write
+#+end_src
+
 * Bring your own notebook
-Use the Open file button, drop an =.org= file onto this window, or launch
-from the terminal with a file path. Edit it elsewhere and save. The preview
+Use the Open file button, drop several =.org= files onto this window, or launch
+from the terminal with file paths. Each file opens in its own tab. Edit it elsewhere and save. The preview
 keeps its scroll position as your document changes.
 
 #+begin_src sh
-npm run dev -- ~/notes/today.org
+npm run dev -- ~/notes/today.org ~/notes/project.org
 #+end_src
 
-This is the first prototype. Local images, links to other Org files, math
-rendering, and full Emacs export compatibility are still ahead of us.
+Switch tabs with =Ctrl+Tab= or =Ctrl+Shift+Tab=. Each tab remembers your place.
+Local images display inline. Links to other Org files, math rendering, and
+full Emacs export compatibility remain outside the current release.

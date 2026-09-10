@@ -14,6 +14,72 @@ Dark preview showing Org tables and source blocks:
 
 [[file:docs/screenshots/preview-dark.png]]
 
+* Compact window toolbar
+Window controls and reading actions share one compact title bar. The title
+bar and document tabs follow the selected theme, including the background
+behind the native window buttons. Drag unused toolbar space to move the window.
+The tabs keep a full-width row beneath it.
+
+The icon and version badge sit beside the app name. Open *Appearance* to
+choose theme preferences. On Linux,
+Electron's window-controls overlay reserves space for the native buttons.
+
+* Document tabs
+Open several files with the file picker, drag and drop, or command-line paths.
+Each document opens in its own tab. Opening the same file again selects its
+existing tab. Files with the same name show their parent folders in the tabs.
+
+Tabs remember your search, selected match, preview/source mode, and scroll
+position in each view. Every open file stays watched. Background saves update
+that document without switching tabs; its preview renders when you select it.
+A missing file keeps its last readable content and shows an error on its tab
+until it returns.
+
+Use =Ctrl+Tab= and =Ctrl+Shift+Tab= to switch tabs on either platform.
+=Cmd+W= on macOS or =Ctrl+W= on Linux closes the active tab. Add Shift to close
+the window. Arrow keys, Home, and End navigate a focused tab strip. Closing the
+last tab leaves an Open action. Tabs are not restored after quitting.
+
+Up to 20 documents can be open, with a 16 MiB limit per file and 64 MiB of
+source files in total. Close a tab to free its watcher and retained content.
+Only the active document retains an image cache and mounted preview.
+
+* Mermaid diagrams
+Mermaid source blocks render as diagrams automatically when you open or save
+an Org file. The renderer is bundled locally; no Emacs, CLI tool, or network
+connection is required. Flowcharts and sequence diagrams are covered by the
+app's desktop checks. Other diagram types in the bundled Mermaid library can
+render, subject to the same limits and offline asset restrictions.
+
+#+begin_src mermaid
+flowchart LR
+  Draft --> Review
+  Review -->|Approved| Publish
+  Review -->|Changes| Draft
+#+end_src
+
+Diagrams follow the active appearance theme. Use *Show source* below a diagram
+to read or search its text. Source view always shows the original Org document.
+Invalid diagrams show their source and an explanation without interrupting the
+rest of the preview.
+
+An immediately following =#+RESULTS:= with one local image link is hidden after
+successful diagram rendering, so an existing Babel image does not appear twice.
+Named blocks require matching result names. If rendering fails, the generated
+image remains visible. Unrelated and ambiguous results remain unchanged.
+
+Rendering is limited to 20 diagrams per document, 20,000 characters per block,
+100,000 diagram characters per document, 200 edges where the diagram type
+supports that limit, 4 MiB of generated SVG per diagram, and five seconds per
+render request. Layout runs in a separate sandboxed renderer so a slow diagram
+can be stopped without freezing the reader.
+
+Mermaid configuration directives and YAML frontmatter are not supported.
+HTML labels, diagram links, callbacks, and external resources are disabled.
+Babel headers such as =:file= never write files or run commands. Generate
+Graphviz, PlantUML, or ditaa images in your editor and use local image links
+for those formats.
+
 * Appearance
 Open *Appearance* in the toolbar to choose *System*, *Light*, or *Dark* mode.
 Choose a light theme and a dark theme independently:
@@ -42,7 +108,8 @@ and =yml= work too. =emacs-lisp= and =elisp= use the generic Lisp grammar.
 Unknown or missing languages, example/export blocks, and inline code stay
 plain text. Blocks over 50,000 characters stay plain text, with a total
 highlighting budget of 200,000 characters per document to limit rendering work.
-The read-only Org source view stays plain text. Code never executes.
+Mermaid blocks use the diagram renderer described above. The read-only Org
+source view stays plain text. Babel code never executes.
 
 * Local images
 Image links without descriptions display inline, for example
@@ -52,7 +119,7 @@ from the Org file's folder; absolute paths and =~/= paths also work.
 Images fit the reading column without being stretched beyond their size.
 
 Missing, unreadable, or invalid images show a placeholder while the document
-remains readable. Images reload when you save or reopen the Org file.
+remains readable. Images reload when you save the Org file or close and reopen its tab.
 Image-only changes are not watched separately. Web images remain links,
 and links with descriptions remain text, following Org's inline-image convention.
 
@@ -269,6 +336,9 @@ account, cloud service, or Emacs installation should be required.
 Use Electron for the desktop shell and Orga for parsing Org syntax. A
 sandboxed renderer displays sanitized HTML. The first prototype favors a
 working file-to-preview loop over complete Org export compatibility.
+Vite bundles renderer dependencies into =dist/=. Packaged apps omit the raw
+=node_modules= tree; the main process uses Electron, Node built-ins, and local
+modules only. Bundled dependency licenses remain in =THIRD-PARTY-NOTICES.org=.
 
 * Outside the first release
 - An editor, agenda, task manager, or replacement for Emacs.
@@ -409,8 +479,8 @@ GitHub Actions runs tests, desktop smoke checks, and packaging on macOS and
 Linux. Successful runs provide prototype installers as workflow artifacts.
 The smoke test requires Chromium sandboxing and checks rendering, source
 view, themes, search and scroll preservation, Unicode file opening,
-file-backed drops, input errors, CLI handoff, saves, atomic replacement,
-delete/recreate recovery, watcher switching, and supported-link dispatch.
+multi-file drops, tabs, Mermaid diagrams, input errors, CLI handoff, saves, atomic replacement,
+delete/recreate recovery, background watchers, and supported-link dispatch.
 It also opens and live-reloads a document over 5 MiB, checks its source,
 search, and outline, and rejects the Wayland Vulkan warning in startup logs.
 Screenshots are saved in =test-results/=.

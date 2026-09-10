@@ -45,6 +45,7 @@ export function initializeAppearance() {
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = colorScheme;
     document.documentElement.dataset.headingFont = preferences.sansSerifHeadings ? 'sans-serif' : 'default';
+    void window.orgPreview.windowTheme(theme).catch(() => {});
   }
   for (const [name, control] of Object.entries(controls)) {
     if (control.type === 'checkbox') control.checked = preferences[name];
