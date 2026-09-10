@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
+import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { createDiagramRenderer } from '../electron/diagrams.cjs';
 
@@ -37,4 +38,20 @@ test('late load failures and crash events from a cancelled renderer cannot stop 
   ipc.emit('diagram:result', { sender: windows[1].webContents, senderFrame: windows[1].webContents.mainFrame }, { requestId: windows[1].request.requestId, svg: '<svg/>' });
   assert.deepEqual(await second, { svg: '<svg/>' });
   renderer.cancel();
+});
+
+test('unit-test imports and injected renderers never bootstrap the Electron binary', () => {
+  const result = spawnSync(process.execPath, ['-e', `
+    const Module = require('node:module');
+    const load = Module._load;
+    Module._load = function (name, ...args) {
+      if (name === 'electron') throw new Error('Unexpected Electron bootstrap');
+      return load.call(this, name, ...args);
+    };
+    const { createDiagramRenderer, diagramSource } = require('./electron/diagrams.cjs');
+    const renderer = createDiagramRenderer({ Window: class {}, ipc: { on() {} } });
+    renderer.cancel();
+    if (typeof diagramSource !== 'function') throw new Error('Missing source validator');
+  `], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
 });
