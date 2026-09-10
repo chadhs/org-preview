@@ -206,6 +206,8 @@ try {
     await window.screenshot({ path: `test-results/${screenshotPrefix}-solarized-${mode}-narrow.png` });
   }
   await setAppearance(window, { mode: 'system' });
+  await expect(window.locator('#appearance-mode')).toHaveValue('system');
+  expect(await window.evaluate(() => localStorage.getItem('org-preview-theme'))).toBe('system');
   await app.close();
   app = await electron.launch({ executablePath, args: [...appArgs, file, path.join(directory, 'links.org'), profileArg, ...process.argv.slice(2)], env, chromiumSandbox: true });
   app.process().stderr.on('data', (chunk) => { stderr += chunk; });
