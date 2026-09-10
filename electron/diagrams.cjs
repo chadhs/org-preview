@@ -1,10 +1,16 @@
-const { BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 
 // A separate renderer keeps layout work off the reader's UI thread. Destroying
 // it interrupts even synchronous layout when an input takes too long.
-function createDiagramRenderer({ Window = BrowserWindow, ipc = ipcMain, timeoutMs = 5000 } = {}) {
+function createDiagramRenderer({ Window, ipc, timeoutMs = 5000 } = {}) {
+  // Pure validation and injected test doubles must not load Electron's Node
+  // entry point, which can install its binary on a fresh development machine.
+  if (!Window || !ipc) {
+    const electron = require('electron');
+    Window ??= electron.BrowserWindow;
+    ipc ??= electron.ipcMain;
+  }
   let window, pending, counter = 0, queue = Promise.resolve();
   const page = path.join(__dirname, '../dist/diagram.html');
   const pageUrl = pathToFileURL(page).href;

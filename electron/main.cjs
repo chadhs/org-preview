@@ -127,5 +127,8 @@ else {
     app.on('activate', () => { if (!win) createWindow(); });
   });
   app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
-  app.on('before-quit', () => { sessions.dispose(); diagrams.cancel(); });
+  app.on('before-quit', () => {
+    if (app.isReady()) session.defaultSession.flushStorageData();
+    sessions.dispose(); diagrams.cancel();
+  });
 }
